@@ -21,6 +21,7 @@ class TestP0(unittest.TestCase):
         self.check_expression(RE0, "b", False)
 
     def test_exercise_1(self) -> None:
+        pass
         self.check_expression(RE1, "", True)
         self.check_expression(RE1, "00", True)
         self.check_expression(RE1, "110101", True)
@@ -30,6 +31,7 @@ class TestP0(unittest.TestCase):
         
 
     def test_exercise_2(self) -> None:
+        pass
         self.check_expression(RE2, "", True)
         self.check_expression(RE2, "0", True)
         self.check_expression(RE2, "1010", True)
@@ -62,10 +64,33 @@ class TestP0(unittest.TestCase):
         self.check_expression(RE4, "juan@estudiante.uam.es", False)
 
     def test_exercise_5(self) -> None:
-        pass
+        self.check_expression(RE5, "01/12/2025", True)
+        self.check_expression(RE5, "09/01/0000", True)
+        self.check_expression(RE5, "31/05/9999", True)
+        self.check_expression(RE5, "05/10/0045", True)
+        self.check_expression(RE5, "20/02/2025", True)
+        self.check_expression(RE5, "1/03/0125", False)
+        self.check_expression(RE5, "01/3/0125", False)
+        self.check_expression(RE5, "01/03/125", False)
+        self.check_expression(RE5, "dd/mm/aaaa", False)
+        self.check_expression(RE5, "30/02/2025", False)
+        self.check_expression(RE5, "31/02/2025", False)
+        self.check_expression(RE5, "32/01/2025", False)
+        self.check_expression(RE5, "31/06/2025", False)
+
 
     def test_exercise_6(self) -> None:
-        pass
+        self.check_expression(RE6, "192.168.0.1", True)
+        self.check_expression(RE6, "0.1.192.168", True)
+        self.check_expression(RE6, "10.0.0.255", True)
+        self.check_expression(RE6, "0.0.0.0", True)
+        self.check_expression(RE6, "172.16.254.1", True)
+        self.check_expression(RE6, "8.8.8.8", True)
+        self.check_expression(RE6, "256.100.50.25", False)
+        self.check_expression(RE6, "192.168.0", False)
+        self.check_expression(RE6, "172.16.0.256", False)
+        self.check_expression(RE6, "10.0.0.1.2", False)
+        
 
 if __name__ == '__main__':
     unittest.main()
