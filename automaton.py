@@ -14,10 +14,29 @@ from utils import is_deterministic
 class FiniteAutomaton:
 
     def __init__(self, initial_state, states, symbols, transitions, final_states):
-        pass
+        self.initial_state = initial_state
+        self.states = states
+        self.symbols = symbols
+        self.transitions = transitions  # Ya viene como dicc de diccs
+        self.final_states = final_states
         
-    def add_transition(start_state, symbol, end_state):
-        pass
+    # Mejorar control de errores
+    def add_transition(self, start_state, symbol, end_state):
+        if start_state not in self.states or (symbol not in self.symbols and symbol is not None) or end_state not in self.states:
+            return False
+
+        if start_state in self.transitions:
+            if symbol in self.transitions[start_state]:
+                if end_state in self.transitions[start_state][symbol]:
+                    return True
+                else:
+                    self.transitions[start_state][symbol].add(end_state)
+            else:
+                self.transitions[start_state][symbol] = set(end_state)
+        else:
+            self.transitions[start_state] = {symbol: set(end_state)}
+        
+        return True
 
     def accepts(self, cadena):
         pass
