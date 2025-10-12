@@ -22,7 +22,8 @@ class FiniteAutomaton:
         
     # Mejorar control de errores
     def add_transition(self, start_state, symbol, end_state):
-        if start_state not in self.states or (symbol not in self.symbols and symbol is not None) or end_state not in self.states:
+        if  (start_state is None) or (symbol is None) or (end_state is None) or \
+            (start_state not in self.states) or (symbol not in self.symbols) or (end_state not in self.states):
             return False
 
         if start_state in self.transitions:
@@ -39,7 +40,8 @@ class FiniteAutomaton:
         return True
 
     def accepts(self, cadena):
-        pass
+        
+        return True
 
     def to_deterministic(self):
         pass
