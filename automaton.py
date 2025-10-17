@@ -22,7 +22,7 @@ class FiniteAutomaton:
         
     def add_transition(self, start_state, symbol, end_state):
         # Validación de parámetros None
-        if start_state is None or symbol is None or end_state is None:
+        if start_state is None or end_state is None:
             return False
 
         # Agregar la transición a la estructura
@@ -38,22 +38,43 @@ class FiniteAutomaton:
             self.transitions[start_state] = {symbol: {end_state}}
         
         return True
+    
+    def lambda_transitions(self, current_states):
+        new_states = set()
+        for state in current_states:
+            if state in self.transitions:
+                transitions = self.transitions[state]
+                for s in transitions:
+                    if s == None:
+                        new_states.update(self.lambda_transitions(transitions[s]))
+        current_states.update(new_states)
+        return current_states
 
     def accepts(self, cadena):
-        print("\nSymbols: ", self.symbols)
-        print("\nTransitions: ", self.transitions)
-        print("\nStates: ", self.states)
-        print("\nCadena: ", cadena)
-        current_state = {self.initial_state} # Set of states
-        for symbol in cadena:
+        current_states = {self.initial_state} # Set of states
+        i = 0
+
+        while True:
+            current_states = self.lambda_transitions(current_states)
+
+            if len(cadena) == 0: break
+            symbol = cadena[i]
+            i += 1
             if symbol not in self.symbols:
                 return False
-            if current_state not in self.transitions:
-                return False
-            if symbol not in self.transitions[current_state]:
-                return False
-            current_state = self.transitions[current_state][symbol]
-        return current_state in self.final_states
+            
+            next_states = set()
+            for state in current_states:
+
+                if state not in self.transitions: continue
+                if symbol not in self.transitions[state]: continue
+
+                next_states.update(self.transitions[state][symbol])
+            current_states = next_states
+
+            if i >= len(cadena): break
+        
+        return current_states.intersection(self.final_states) != set()
 
     def to_deterministic(self):
         pass
