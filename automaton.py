@@ -20,28 +20,40 @@ class FiniteAutomaton:
         self.transitions = transitions  # Ya viene como dicc de diccs
         self.final_states = final_states
         
-    # Mejorar control de errores
     def add_transition(self, start_state, symbol, end_state):
-        if  (start_state is None) or (symbol is None) or (end_state is None) or \
-            (start_state not in self.states) or (symbol not in self.symbols) or (end_state not in self.states):
+        # Validación de parámetros None
+        if start_state is None or symbol is None or end_state is None:
             return False
 
+        # Agregar la transición a la estructura
         if start_state in self.transitions:
             if symbol in self.transitions[start_state]:
                 if end_state in self.transitions[start_state][symbol]:
-                    return True
+                    return True  # La transición ya existe
                 else:
                     self.transitions[start_state][symbol].add(end_state)
             else:
-                self.transitions[start_state][symbol] = set(end_state)
+                self.transitions[start_state][symbol] = {end_state}
         else:
-            self.transitions[start_state] = {symbol: set(end_state)}
+            self.transitions[start_state] = {symbol: {end_state}}
         
         return True
 
     def accepts(self, cadena):
-        
-        return True
+        print("\nSymbols: ", self.symbols)
+        print("\nTransitions: ", self.transitions)
+        print("\nStates: ", self.states)
+        print("\nCadena: ", cadena)
+        current_state = {self.initial_state} # Set of states
+        for symbol in cadena:
+            if symbol not in self.symbols:
+                return False
+            if current_state not in self.transitions:
+                return False
+            if symbol not in self.transitions[current_state]:
+                return False
+            current_state = self.transitions[current_state][symbol]
+        return current_state in self.final_states
 
     def to_deterministic(self):
         pass

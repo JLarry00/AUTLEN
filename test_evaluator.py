@@ -19,8 +19,11 @@ class TestEvaluatorBase(ABC, unittest.TestCase):
         self.automaton = self._create_automata()
 
     def _check_accept_body(self, string, should_accept = True):
+        print("\n\nChecking accept for string: ", string, "\n\n")
         accepted = self.automaton.accepts(string)
+        print("\n\nAccepted: ", accepted, "\n\n")
         self.assertEqual(accepted, should_accept)
+        print("\n\nEqual: ", self.assertEqual(accepted, should_accept), "\n\n")
 
     def _check_accept(self, string, should_accept = True, exception = None):
 
@@ -36,6 +39,8 @@ class TestEvaluatorFixed(TestEvaluatorBase):
     """Test for a fixed string."""
 
     def _create_automata(self):
+
+        print("\n\nCreating automaton...\n\n")
 
         description = """
         Automaton:
@@ -59,7 +64,9 @@ class TestEvaluatorFixed(TestEvaluatorBase):
 
     def test_fixed(self):
         """Test for a fixed string."""
+        print("\n\n\n\nTesting fixed string...\n\n\n\n")
         self._check_accept("Hello", should_accept=True)
+        print("\n\n\n\nFinished testing fixed string...\n\n\n\n")
         self._check_accept("Helloo", should_accept=False)
         self._check_accept("Hell", should_accept=False)
         self._check_accept("llH", should_accept=False)
