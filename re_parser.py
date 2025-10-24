@@ -51,6 +51,77 @@ class REParser():
     def __init__(self) -> None:
         self.state_counter = 0
 
+    def _new_state(self):
+        s = f"q{self.state_counter}"
+        self.state_counter += 1
+        return s
+
+
+    def _epsilon_closure(self, aut, states):
+        """Cierre-λ (None) sobre el autómata de Thompson ya construido."""
+        stack = list(states)
+        seen = set(states)
+        while stack:
+            s = stack.pop()
+            for t in aut.transitions.get(s, {}).get(None, set()):
+                if t not in seen:
+                    seen.add(t)
+                    stack.append(t)
+        return seen
+
+    def _remove_epsilons(self, aut):
+        """
+        Elimina transiciones λ del AFND:
+        Para cada estado s y símbolo a:
+            δ'(s,a) = ε-closure( move( ε-closure(s), a ) )
+        Estados finales' = { s | ε-closure(s) ∩ F ≠ ∅ }
+        """
+        symbols = tuple(aut.symbols)  # mantenemos el alfabeto igual (sin None)
+        states = list(aut.states)
+
+        # 1) precalcular cierres ε de cada estado
+        eclose = {s: self._epsilon_closure(aut, {s}) for s in states}
+
+        # 2) construir nuevas transiciones sin None
+        new_trans = {}
+        for s in states:
+            new_trans.setdefault(s, {})
+            for a in symbols:
+                # move desde todo el cierre ε de s
+                T = set()
+                for t in eclose[s]:
+                    T |= aut.transitions.get(t, {}).get(a, set())
+                # cierre ε después de consumir a
+                T2 = set()
+                for u in T:
+                    T2 |= eclose[u]
+                if T2:
+                    new_trans[s][a] = T2
+
+        # 3) estados finales nuevos: los que alcanzan un final vía ε
+        new_finals = set()
+        for s in states:
+            if eclose[s] & aut.final_states:
+                new_finals.add(s)
+
+        # 4) devolver autómata sin λ
+        return FiniteAutomaton(
+            initial_state=aut.initial_state,
+            states=states,
+            symbols=symbols,
+            transitions=new_trans,
+            final_states=new_finals,
+        )
+   
+    def _copy(self, A):
+        return FiniteAutomaton(
+            initial_state=A.initial_state,
+            states=list(A.states),
+            symbols=set(A.symbols),
+            transitions={p:{a:set(T) for a,T in d.items()} for p,d in (A.transitions or {}).items()},
+            final_states=set(A.final_states),
+        )
+
     def _create_automaton_empty(self):
         """
         Create an automaton that accepts the empty language.
@@ -59,10 +130,14 @@ class REParser():
             Automaton that accepts the empty language. Type: FiniteAutomaton
 
         """
-        #---------------------------------------------------------------------
-        # TO DO: Implement this method...
-        raise NotImplementedError("This method must be implemented.")        
-        #---------------------------------------------------------------------
+        q0 = self._new_state()
+        return FiniteAutomaton(
+            initial_state=q0,
+            states=[q0],
+            symbols=set(),
+            transitions={},
+            final_states=set(),
+        )
         
 
     def _create_automaton_lambda(self):
@@ -73,10 +148,14 @@ class REParser():
             Automaton that accepts the empty string. Type: FiniteAutomaton
 
         """
-        #---------------------------------------------------------------------
-        # TO DO: Implement this method...
-        raise NotImplementedError("This method must be implemented.")        
-        #---------------------------------------------------------------------
+        q0 = self._new_state()
+        return FiniteAutomaton(
+            initial_state=q0,
+            states=[q0],
+            symbols=set(),
+            transitions={},
+            final_states={q0},
+        )
 
 
     def _create_automaton_symbol(self, symbol):
@@ -90,13 +169,16 @@ class REParser():
             Automaton that accepts a symbol. Type: FiniteAutomaton
 
         """
-        #---------------------------------------------------------------------
-        # TO DO: Implement this method...
-        raise NotImplementedError("This method must be implemented.")        
-        #---------------------------------------------------------------------
+        q0, q1 = self._new_state(), self._new_state()
+        return FiniteAutomaton(
+            initial_state=q0,
+            states=[q0, q1],
+            symbols={symbol},
+            transitions={q0: {symbol: {q1}}},
+            final_states={q1},
+        )
 
-
-    def _create_automaton_star(self, automaton):
+    def _create_automaton_star(self, A):
         """
         Create an automaton that accepts the Kleene star of another.
 
@@ -107,13 +189,20 @@ class REParser():
             Automaton that accepts the Kleene star. Type: FiniteAutomaton
 
         """
-        #---------------------------------------------------------------------
-        # TO DO: Implement this method...
-        raise NotImplementedError("This method must be implemented.")  
-        #---------------------------------------------------------------------
+        A = self._copy(A)
+        qi, qf = self._new_state(), self._new_state()
+        states = [qi, qf] + A.states
+        symbols = set(A.symbols)
+        trans = {p:{a:set(T) for a,T in d.items()} for p,d in (A.transitions or {}).items()}
+
+        trans.setdefault(qi, {}).setdefault(None, set()).update({A.initial_state, qf})
+        for f in A.final_states:
+            trans.setdefault(f, {}).setdefault(None, set()).update({A.initial_state, qf})
+
+        return FiniteAutomaton(qi, states, symbols, trans, {qf})
 
 
-    def _create_automaton_union(self, automaton1, automaton2):
+    def _create_automaton_union(self, A, B):
         """
         Create an automaton that accepts the union of two automata.
 
@@ -125,13 +214,24 @@ class REParser():
             Automaton that accepts the union. Type: FiniteAutomaton.
 
         """
-        #---------------------------------------------------------------------
-        # TO DO: Implement this method...
-        raise NotImplementedError("This method must be implemented.")  
-        #---------------------------------------------------------------------
+        A, B = self._copy(A), self._copy(B)
+        qi, qf = self._new_state(), self._new_state()
+        states = [qi, qf] + A.states + B.states
+        symbols = set(A.symbols) | set(B.symbols)
+        trans = {p:{a:set(T) for a,T in d.items()} for p,d in (A.transitions or {}).items()}
+        for p,d in (B.transitions or {}).items():
+            trans.setdefault(p, {})
+            for a,T in d.items():
+                trans[p].setdefault(a, set()).update(T)
+
+        trans.setdefault(qi, {}).setdefault(None, set()).update({A.initial_state, B.initial_state})
+        for f in A.final_states | B.final_states:
+            trans.setdefault(f, {}).setdefault(None, set()).add(qf)
+
+        return FiniteAutomaton(qi, states, symbols, trans, {qf})
 
 
-    def _create_automaton_concat(self, automaton1, automaton2):
+    def _create_automaton_concat(self, A, B):
         """
         Create an automaton that accepts the concatenation of two automata.
 
@@ -143,10 +243,19 @@ class REParser():
             Automaton that accepts the concatenation. Type: FiniteAutomaton.
 
         """
-        #---------------------------------------------------------------------
-        # TO DO: Implement this method...
-        raise NotImplementedError("This method must be implemented.")     
-        #---------------------------------------------------------------------
+        A, B = self._copy(A), self._copy(B)
+        states = A.states + B.states
+        symbols = set(A.symbols) | set(B.symbols)
+        trans = {p:{a:set(T) for a,T in d.items()} for p,d in (A.transitions or {}).items()}
+        for p,d in (B.transitions or {}).items():
+            trans.setdefault(p, {})
+            for a,T in d.items():
+                trans[p].setdefault(a, set()).update(T)
+
+        for f in A.final_states:
+            trans.setdefault(f, {}).setdefault(None, set()).add(B.initial_state)
+
+        return FiniteAutomaton(A.initial_state, states, symbols, trans, set(B.final_states))
 
 
     def create_automaton(
@@ -165,12 +274,11 @@ class REParser():
         """
         if not re_string:
             return self._create_automaton_empty()
-        
+
         rpn_string = _re_to_rpn(re_string)
-
-        stack = [] # list of FiniteAutomatons
-
+        stack = []
         self.state_counter = 0
+
         for x in rpn_string:
             if x == "*":
                 aut = stack.pop()
@@ -188,4 +296,6 @@ class REParser():
             else:
                 stack.append(self._create_automaton_symbol(x))
 
-        return stack.pop()
+        nfa = stack.pop()
+        #clave: eliminamos ε para que accepts() (sin cierre final) funcione
+        return self._remove_epsilons(nfa)
