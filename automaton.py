@@ -45,7 +45,7 @@ class FiniteAutomaton:
             if state in self.transitions:
                 transitions = self.transitions[state]
                 for s in transitions:
-                    if s == None:
+                    if s is None:
                         new_states.update(self.lambda_transitions(transitions[s]))
         current_states.update(new_states)
         return current_states
@@ -73,6 +73,7 @@ class FiniteAutomaton:
             current_states = next_states
 
             if i >= len(cadena): break
+        current_states = self.lambda_transitions(current_states)
         
         return current_states.intersection(self.final_states) != set()
 
