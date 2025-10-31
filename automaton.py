@@ -6,6 +6,7 @@
 from collections import deque
 from graphviz import Digraph
 from utils import is_deterministic
+from re_parser import *
 
 """
     Podéis implementar cualquier función auxiliar que consideréis necesaria
@@ -50,6 +51,16 @@ class FiniteAutomaton:
         current_states.update(new_states)
         return current_states
 
+    def symbol_transitions(self, current_states, symbol):
+        new_states = set()
+        for state in current_states:
+            if state in self.transitions:
+                transitions = self.transitions[state]
+                for s in transitions:
+                    if s is symbol:
+                        new_states.update(self.lambda_transitions(transitions[s]))
+        return new_states
+
     def accepts(self, cadena):
         current_states = {self.initial_state} # Set of states
         i = 0
@@ -78,7 +89,27 @@ class FiniteAutomaton:
         return current_states.intersection(self.final_states) != set()
 
     def to_deterministic(self):
-        pass
+        rp = REParser()
+        states_init = self.lambda_transitions({self.initial_state})
+        all_states = list(states_init)
+        estados = set(rp._new_state())
+        i = 0
+        while True:
+            flag = False
+            states = all_states[i]
+            for s in self.symbols:
+                st_finals = self.symbol_transitions(states, s)
+                if st_finals is not None and st_finals not in all_states:
+                    all_states.insert(st_finals)    #rvisar si inserts es lo que queremos
+                    flag = True
+                    st = rp._new_state()
+                    estados.add(st)
+
+            if flag is False:
+                break
+            i += 1
+        #A = FiniteAutomaton(self)
+        
 
     def to_minimized(self):
         pass
