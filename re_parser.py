@@ -3,7 +3,7 @@
     Última modificación: 18 de septiembre de 2025
 """
 
-from automaton import FiniteAutomaton
+from automaton import *
 
 def _re_to_rpn(re_string):
     """
