@@ -1,0 +1,143 @@
+    def _reachable_subautomaton(self):
+        """
+        Devuelve un nuevo autómata solo con los estados alcanzables
+        desde el estado inicial (BFS).
+        """
+        queue = deque([self.initial_state])
+        reachable = {self.initial_state}
+        symbols = tuple(self.symbols)  # asegurar iterabilidad
+
+        while queue:
+            state = queue.popleft()
+            if state not in self.transitions:
+                continue
+            for a in symbols:
+                # destino(s) posibles para ese símbolo
+                for next_state in self.transitions.get(state, {}).get(a, set()):
+                    if next_state not in reachable:
+                        reachable.add(next_state)
+                        queue.append(next_state)
+
+        # Filtrar los componentes del autómata
+        new_states = [s for s in self.states if s in reachable]
+        new_finals = {s for s in self.final_states if s in reachable}
+
+        new_trans = {}
+        for s in new_states:
+            if s in self.transitions:
+                for a, dests in self.transitions[s].items():
+                    valid_dests = {t for t in dests if t in reachable}
+                    if valid_dests:
+                        new_trans.setdefault(s, {})[a] = valid_dests
+
+        # Construir nuevo autómata con los estados alcanzables
+        return FiniteAutomaton(
+            initial_state=self.initial_state,
+            states=new_states,
+            symbols=self.symbols,
+            transitions=new_trans,
+            final_states=new_finals,
+        )
+
+    def to_minimized(self):
+        # 0) Debe ser determinista para minimizar (según el enunciado)
+        if not is_deterministic(self):
+            raise ValueError("to_minimized requiere un AFD (determinista)")
+
+        # 1) Limpieza: nos quedamos sólo con los alcanzables (BFS del paso 1)
+        afd = self._reachable_subautomaton()
+
+        symbols = tuple(afd.symbols) if not isinstance(afd.symbols, (tuple, list)) else tuple(afd.symbols)
+        states  = list(afd.states)
+        finals  = set(afd.final_states)
+        trans   = afd.transitions  # dict[state][a] -> {dest}
+
+        # 2) Partición inicial: F / ¬F
+        P = []
+        F  = finals
+        NF = set(states) - F
+        if F:
+            P.append(F)
+        if NF:
+            P.append(NF)
+
+        # Aux: estado -> índice de bloque (se recalcula en cada iteración)
+        def idx_of(state, part):
+            for i, block in enumerate(part):
+                if state in block:
+                    return i
+            return None  # no debería pasar
+
+        # 3) Refinamiento hasta fijar
+        changed = True
+        while changed:
+            changed = False
+            newP = []
+
+            for block in P:
+                # Firmas: para cada estado del bloque, vector con el índice del bloque
+                # al que cae con cada símbolo (o None si no hay transición)
+                buckets = {}
+                for s in block:
+                    sig = []
+                    for a in symbols:
+                        dests = trans.get(s, {}).get(a, set())
+                        if dests:
+                            (t,) = tuple(dests)     # AFD => a lo sumo 1 destino
+                            sig.append(idx_of(t, P))
+                        else:
+                            sig.append(None)
+                    sig = tuple(sig)
+                    buckets.setdefault(sig, set()).add(s)
+
+                # dividir por firmas
+                for subset in buckets.values():
+                    newP.append(subset)
+                if len(buckets) > 1:
+                    changed = True
+
+            P = newP
+
+        # 4) Construcción del DFA mínimo
+        # Nombre estable para cada bloque
+        block_name = {}
+        new_states = []
+        new_finals = set()
+        for i, block in enumerate(P):
+            name = f"B{i}"
+            block_name[frozenset(block)] = name
+            new_states.append(name)
+            if block & finals:
+                new_finals.add(name)
+
+        # Estado inicial = bloque que contiene al inicial
+        init_name = None
+        for block in P:
+            if afd.initial_state in block:
+                init_name = block_name[frozenset(block)]
+                break
+
+        # Transiciones: tomar un representante por bloque
+        new_trans = {}
+        for block in P:
+            rep = next(iter(block))
+            src = block_name[frozenset(block)]
+            for a in symbols:
+                dests = trans.get(rep, {}).get(a, set())
+                if not dests:
+                    continue
+                (t,) = tuple(dests)
+                # buscar el bloque de t
+                for B in P:
+                    if t in B:
+                        dst = block_name[frozenset(B)]
+                        new_trans.setdefault(src, {}).setdefault(a, set()).add(dst)
+                        break
+
+        return FiniteAutomaton(
+            initial_state=init_name,
+            states=new_states,
+            symbols=set(symbols),
+            transitions=new_trans,
+            final_states=new_finals,
+        )
