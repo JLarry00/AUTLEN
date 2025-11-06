@@ -1,0 +1,12 @@
+// Automata
+digraph {
+	rankdir=LR
+	"" [shape=none]
+	"{'q0q2q4'}" [shape=doublecircle]
+	"{'q1q3q5'}" [shape=circle]
+	"" -> "{'q0q2q4'}"
+	"{'q0q2q4'}" -> "{'q1q3q5'}" [label=0]
+	"{'q0q2q4'}" -> "{'q1q3q5'}" [label=1]
+	"{'q1q3q5'}" -> "{'q0q2q4'}" [label=0]
+	"{'q1q3q5'}" -> "{'q0q2q4'}" [label=1]
+}

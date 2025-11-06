@@ -1,0 +1,18 @@
+// Automata
+digraph {
+	rankdir=LR
+	"" [shape=none]
+	Initial [shape=circle]
+	B1 [shape=doublecircle]
+	B2 [shape=doublecircle]
+	Empty [shape=circle]
+	"" -> Initial
+	Initial -> B1 [label=a]
+	Initial -> Empty [label=b]
+	B1 -> B1 [label=a]
+	B1 -> B2 [label=b]
+	B2 -> B1 [label=a]
+	B2 -> B1 [label=b]
+	Empty -> Empty [label=a]
+	Empty -> Empty [label=b]
+}
