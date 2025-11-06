@@ -3,11 +3,14 @@
     Última modificación: 18 de septiembre de 2025
 """
 
+from cgi import test
 from collections import deque
 from hmac import new
+from typing import assert_never
+import unittest
 from graphviz import Digraph
 from utils import is_deterministic
-from queue import Queue as q
+import queue as q
 
 """
     Podéis implementar cualquier función auxiliar que consideréis necesaria
@@ -136,13 +139,85 @@ class FiniteAutomaton:
 
     def to_minimized(self):
         #BFS
-        new_states, new_transitions = self.automaton_bfs()
-        new_final_states = {st for st in new_states if st in self.final_states}
+        states, transitions = self.automaton_bfs()
+        F_states = set(states).intersection(self.final_states)
+        NF_states = set(states) - F_states
+
+        #print(f"Old States: {states}")
 
         #Iteraciones
+        current_classes = {st: 0 if st in NF_states else 1 for st in states}
+        old_classes = {}
+
+        flag = True
+        k = 1
+        while flag:
+            classes_map = {}
+            flag = False
+            old_classes = current_classes
+            current_classes = {}
+
+            i = 0
+            class_number = 0
+            for st in states:
+                if st not in current_classes.keys():
+                    if st == list(states)[0]:
+                        current_classes[st] = 0
+                        classes_map[0] = {st}
+                    else:
+                        class_number += 1
+                        current_classes[st] = class_number
+                        classes_map[class_number] = {st}
+                
+                for st2 in list(states)[i+1:]:
+
+                    same_class = False
+                    if (st2 not in current_classes.keys()) and (old_classes[st2] == old_classes[st]):
+                        same_class = True
+                        for symbol in transitions[st2]:
+                            stf1 = list(transitions[st][symbol])[0]
+                            stf2 = list(transitions[st2][symbol])[0]
+                            if old_classes[stf1] != old_classes[stf2]:
+                                same_class = False
+                                break
+                    if same_class:
+                        current_classes[st2] = current_classes[st]
+                        classes_map[class_number].add(st2)
+                i += 1
+                if i > len(states):
+                    break
+            if current_classes != old_classes:
+                flag = True
+            k += 1
 
         #Estados
-        pass
+        new_states = []
+        for st in classes_map.values():
+            new_states.append(str(st))
+        
+        #print("New states:",new_states)
+
+        if len(self.final_states) > 0:
+            final_class = current_classes[list(self.final_states)[0]]
+            new_final_states = {str(classes_map[final_class])}
+        else:
+            new_final_states = set()
+
+        initial_class = current_classes[self.initial_state]
+        new_initial_state = str(classes_map[initial_class])
+
+        A = FiniteAutomaton(new_initial_state, new_states, self.symbols, {}, new_final_states)
+        for state in states:
+            j = current_classes[state]
+            current_st = str(classes_map[j])
+            for symbol in transitions[state]:
+                for state_fin in transitions[state][symbol]:
+                    i = current_classes[state_fin]
+                    A.add_transition(current_st, symbol, str(classes_map[i]))
+
+        #print(A)
+
+        return A
         
     def draw(self, path="./images/", filename="automata.png", view=False):
         dot = Digraph(comment="Automata", format="png")
@@ -192,14 +267,14 @@ class FiniteAutomaton:
 
         return s
 
-    def automaton_bfs(self):
-        queue = q()
-        queue.push(self.initial_state) # DEFINE THE INITIAL STATE
+    def automaton_bfs(self) -> tuple[set[str], dict[str, dict[str, set[str]]]]:
+        queue = q.Queue()
+        queue.put(self.initial_state)
         reachable_states = []
         transition_dict = {}
 
-        while not queue.isEmpty():
-            current_state = queue.pop()
+        while not queue.empty():
+            current_state = queue.get()
 
             if current_state not in reachable_states:
                 reachable_states.append(current_state)
@@ -210,6 +285,6 @@ class FiniteAutomaton:
                 for symbol in transitions:
                     for state in transitions[symbol]:
                         if state not in reachable_states:
-                            queue.push(state)
+                            queue.put(state)
 
         return reachable_states, transition_dict

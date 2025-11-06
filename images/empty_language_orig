@@ -1,0 +1,14 @@
+// Automata
+digraph {
+	rankdir=LR
+	"" [shape=none]
+	Initial [shape=doublecircle]
+	NotReached1 [shape=circle]
+	NotReached2 [shape=circle]
+	Empty [shape=circle]
+	"" -> Initial
+	Initial -> Empty [label=a]
+	NotReached1 -> NotReached2 [label=a]
+	NotReached2 -> Empty [label=a]
+	Empty -> Empty [label=a]
+}

@@ -1,0 +1,8 @@
+// Automata
+digraph {
+	rankdir=LR
+	"" [shape=none]
+	Initial [shape=circle]
+	"" -> Initial
+	Initial -> Initial [label=a]
+}
