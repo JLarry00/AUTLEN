@@ -130,8 +130,7 @@ class REParser():
             Automaton that accepts the empty language. Type: FiniteAutomaton
 
         """
-        qi = self._new_state()
-        qf = self._new_state()
+        qi, qf = self._new_state(), self._new_state()
         return FiniteAutomaton(
             initial_state=qi,
             states=[qi, qf],
@@ -149,8 +148,7 @@ class REParser():
             Automaton that accepts the empty string. Type: FiniteAutomaton
 
         """
-        qi = self._new_state()
-        qf = self._new_state()
+        qi, qf = self._new_state(), self._new_state()
         return FiniteAutomaton(
             initial_state=qi,
             states=[qi, qf],
@@ -191,7 +189,7 @@ class REParser():
             Automaton that accepts the Kleene star. Type: FiniteAutomaton
 
         """
-        A = self._copy(A)
+        #A = self._copy(A)
         qi, qf = self._new_state(), self._new_state()
         states = [qi, qf] + A.states
         symbols = set(A.symbols)
@@ -216,7 +214,7 @@ class REParser():
             Automaton that accepts the union. Type: FiniteAutomaton.
 
         """
-        A, B = self._copy(A), self._copy(B)
+        #A, B = self._copy(A), self._copy(B)
         qi, qf = self._new_state(), self._new_state()
         states = [qi, qf] + A.states + B.states
         symbols = set(A.symbols) | set(B.symbols)
@@ -244,7 +242,10 @@ class REParser():
             Automaton that accepts the concatenation. Type: FiniteAutomaton.
 
         """
-        A, B = self._copy(A), self._copy(B)
+        #print(A)
+        #print(B)
+        
+        #A, B = self._copy(A), self._copy(B)
         states = [A.states[0], B.states[1]] + [s for s in A.states if s not in [A.states[0]]] + [s for s in B.states if s not in [B.states[1]]]
         symbols = set(A.symbols) | set(B.symbols)
         trans = A.transitions | B.transitions

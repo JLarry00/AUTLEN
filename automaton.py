@@ -4,8 +4,10 @@
 """
 
 from collections import deque
+from hmac import new
 from graphviz import Digraph
 from utils import is_deterministic
+from queue import Queue as q
 
 """
     Podéis implementar cualquier función auxiliar que consideréis necesaria
@@ -95,75 +97,51 @@ class FiniteAutomaton:
         return current_states.intersection(self.final_states) != set()
 
     def to_deterministic(self):
-        from re_parser import REParser
-        rp = REParser()
-
-        debug = False
-        #debug = True
-
         init_st_set = self.lambda_transitions({self.initial_state})
         all_st_set_list = [init_st_set]
-        new_init_st = rp._new_state()
+        new_init_st = str(init_st_set)
         new_st_list = [new_init_st]
         new_final_states = set()
         if init_st_set.intersection(self.final_states) != set():
             new_final_states.add(new_init_st)
 
-        if debug: print(self)
-
         A = FiniteAutomaton(new_init_st, new_st_list, self.symbols, {}, set())
 
         i = 0
         while i < len(all_st_set_list):
-            if debug: print(f"\n\
-==========================================================\n\
-                        Step: {i}\n\
-==========================================================")
             current_st_set = all_st_set_list[i]
-            if debug: print(f"current_st_set: {current_st_set}")
 
             for s in self.symbols:
-                if debug: print(f"\n=========\nsymbol: {s}\n=========")
                 goal_st_set = self.symbol_transitions(current_st_set, s)
-                if debug: print(f"goal_st_set: {goal_st_set}")
 
                 new_goal_st = "Empty"
                 if goal_st_set not in all_st_set_list:
-                    if debug: print(f"goal_st_set not in all_st_set_list")
                     if len(goal_st_set) > 0:
-                        new_goal_st = rp._new_state()
-                        if debug: print(f"new_goal_st: {new_goal_st}")
+                        new_goal_st = str(goal_st_set)
                     new_st_list.append(new_goal_st)
-                    if debug: print(f"new_st_list: {new_st_list}")
                     all_st_set_list.append(goal_st_set)
-                    if debug: print(f"all_st_set_list: {all_st_set_list}")
                 
                 elif len(goal_st_set) > 0:
-                    if debug: print(f"goal_st_set in all_st_set_list")
                     j = all_st_set_list.index(goal_st_set)
                     new_goal_st = new_st_list[j]
-                    if debug: print(f"new_goal_st: {new_goal_st}")
-                if debug: print(f"A.add_transition: {new_st_list[i]} -{s}-> {new_goal_st}")
                 A.add_transition(new_st_list[i], s, new_goal_st)
 
                 if goal_st_set.intersection(self.final_states) != set():
-                    if debug: print(f"goal_st_set.intersection(self.final_states) != set()")
                     new_final_states.add(new_goal_st)
-                    if debug: print(f"new_final_states: {new_final_states}")
             i += 1
 
         A.__update_final_states__(new_final_states)
 
-        if debug: print(f"\n\
-==========================================================\n\
-                    Final Automaton\n\
-==========================================================")  
-
-        if debug: print(A)
-        
         return A
 
     def to_minimized(self):
+        #BFS
+        new_states, new_transitions = self.automaton_bfs()
+        new_final_states = {st for st in new_states if st in self.final_states}
+
+        #Iteraciones
+
+        #Estados
         pass
         
     def draw(self, path="./images/", filename="automata.png", view=False):
@@ -213,3 +191,25 @@ class FiniteAutomaton:
                     s += f"    {state_ini} -{sym}-> {state_fin}\n"
 
         return s
+
+    def automaton_bfs(self):
+        queue = q()
+        queue.push(self.initial_state) # DEFINE THE INITIAL STATE
+        reachable_states = []
+        transition_dict = {}
+
+        while not queue.isEmpty():
+            current_state = queue.pop()
+
+            if current_state not in reachable_states:
+                reachable_states.append(current_state)
+                
+                transitions = self.transitions[current_state]
+                transition_dict[current_state] = transitions
+
+                for symbol in transitions:
+                    for state in transitions[symbol]:
+                        if state not in reachable_states:
+                            queue.push(state)
+
+        return reachable_states, transition_dict
