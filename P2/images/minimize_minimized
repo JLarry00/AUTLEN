@@ -1,0 +1,15 @@
+// Automata
+digraph {
+	rankdir=LR
+	"" [shape=none]
+	"{'Initial'}" [shape=circle]
+	"{'B2', 'B1'}" [shape=doublecircle]
+	"{'Empty'}" [shape=circle]
+	"" -> "{'Initial'}"
+	"{'Initial'}" -> "{'B2', 'B1'}" [label=a]
+	"{'Initial'}" -> "{'Empty'}" [label=b]
+	"{'B2', 'B1'}" -> "{'B2', 'B1'}" [label=a]
+	"{'B2', 'B1'}" -> "{'B2', 'B1'}" [label=b]
+	"{'Empty'}" -> "{'Empty'}" [label=a]
+	"{'Empty'}" -> "{'Empty'}" [label=b]
+}

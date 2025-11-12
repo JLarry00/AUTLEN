@@ -1,6 +1,6 @@
 """
-    Equipo docente de Autómatas y Lenguajes Curso 2025-26
-    Última modificación: 18 de septiembre de 2025
+    Jose-Ignacio Fernández de la Puente Perez y Juan Larrondo Fernández de Córdoba
+    Última modificación: 7/nov/2025
 """
 
 from automaton import *
@@ -57,61 +57,61 @@ class REParser():
         return s
 
 
-    def _epsilon_closure(self, aut, states):
-        """Cierre-λ (None) sobre el autómata de Thompson ya construido."""
-        stack = list(states)
-        seen = set(states)
-        while stack:
-            s = stack.pop()
-            for t in aut.transitions.get(s, {}).get(None, set()):
-                if t not in seen:
-                    seen.add(t)
-                    stack.append(t)
-        return seen
+    # def _epsilon_closure(self, aut, states):
+    #     """Cierre-λ (None) sobre el autómata de Thompson ya construido."""
+    #     stack = list(states)
+    #     seen = set(states)
+    #     while stack:
+    #         s = stack.pop()
+    #         for t in aut.transitions.get(s, {}).get(None, set()):
+    #             if t not in seen:
+    #                 seen.add(t)
+    #                 stack.append(t)
+    #     return seen
 
-    def _remove_epsilons(self, aut):
-        """
-        Elimina transiciones λ del AFND:
-        Para cada estado s y símbolo a:
-            δ'(s,a) = ε-closure( move( ε-closure(s), a ) )
-        Estados finales' = { s | ε-closure(s) ∩ F ≠ ∅ }
-        """
-        symbols = tuple(aut.symbols)  # mantenemos el alfabeto igual (sin None)
-        states = list(aut.states)
+    # def _remove_epsilons(self, aut):
+    #     """
+    #     Elimina transiciones λ del AFND:
+    #     Para cada estado s y símbolo a:
+    #         δ'(s,a) = ε-closure( move( ε-closure(s), a ) )
+    #     Estados finales' = { s | ε-closure(s) ∩ F ≠ ∅ }
+    #     """
+    #     symbols = tuple(aut.symbols)  # mantenemos el alfabeto igual (sin None)
+    #     states = list(aut.states)
 
-        # 1) precalcular cierres ε de cada estado
-        eclose = {s: self._epsilon_closure(aut, {s}) for s in states}
+    #     # 1) precalcular cierres ε de cada estado
+    #     eclose = {s: self._epsilon_closure(aut, {s}) for s in states}
 
-        # 2) construir nuevas transiciones sin None
-        new_trans = {}
-        for s in states:
-            new_trans.setdefault(s, {})
-            for a in symbols:
-                # move desde todo el cierre ε de s
-                T = set()
-                for t in eclose[s]:
-                    T |= aut.transitions.get(t, {}).get(a, set())
-                # cierre ε después de consumir a
-                T2 = set()
-                for u in T:
-                    T2 |= eclose[u]
-                if T2:
-                    new_trans[s][a] = T2
+    #     # 2) construir nuevas transiciones sin None
+    #     new_trans = {}
+    #     for s in states:
+    #         new_trans.setdefault(s, {})
+    #         for a in symbols:
+    #             # move desde todo el cierre ε de s
+    #             T = set()
+    #             for t in eclose[s]:
+    #                 T |= aut.transitions.get(t, {}).get(a, set())
+    #             # cierre ε después de consumir a
+    #             T2 = set()
+    #             for u in T:
+    #                 T2 |= eclose[u]
+    #             if T2:
+    #                 new_trans[s][a] = T2
 
-        # 3) estados finales nuevos: los que alcanzan un final vía ε
-        new_finals = set()
-        for s in states:
-            if eclose[s] & aut.final_states:
-                new_finals.add(s)
+    #     # 3) estados finales nuevos: los que alcanzan un final vía ε
+    #     new_finals = set()
+    #     for s in states:
+    #         if eclose[s] & aut.final_states:
+    #             new_finals.add(s)
 
-        # 4) devolver autómata sin λ
-        return FiniteAutomaton(
-            initial_state=aut.initial_state,
-            states=states,
-            symbols=symbols,
-            transitions=new_trans,
-            final_states=new_finals,
-        )
+    #     # 4) devolver autómata sin λ
+    #     return FiniteAutomaton(
+    #         initial_state=aut.initial_state,
+    #         states=states,
+    #         symbols=symbols,
+    #         transitions=new_trans,
+    #         final_states=new_finals,
+    #     )
    
     def _copy(self, A):
         return FiniteAutomaton(
@@ -189,7 +189,6 @@ class REParser():
             Automaton that accepts the Kleene star. Type: FiniteAutomaton
 
         """
-        #A = self._copy(A)
         qi, qf = self._new_state(), self._new_state()
         states = [qi, qf] + A.states
         symbols = set(A.symbols)
@@ -214,7 +213,6 @@ class REParser():
             Automaton that accepts the union. Type: FiniteAutomaton.
 
         """
-        #A, B = self._copy(A), self._copy(B)
         qi, qf = self._new_state(), self._new_state()
         states = [qi, qf] + A.states + B.states
         symbols = set(A.symbols) | set(B.symbols)
@@ -242,10 +240,6 @@ class REParser():
             Automaton that accepts the concatenation. Type: FiniteAutomaton.
 
         """
-        #print(A)
-        #print(B)
-        
-        #A, B = self._copy(A), self._copy(B)
         states = [A.states[0], B.states[1]] + [s for s in A.states if s not in [A.states[0]]] + [s for s in B.states if s not in [B.states[1]]]
         symbols = set(A.symbols) | set(B.symbols)
         trans = A.transitions | B.transitions

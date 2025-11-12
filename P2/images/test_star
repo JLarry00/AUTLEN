@@ -17,9 +17,9 @@ digraph {
 	q1 -> q3 [label="λ"]
 	q1 -> q0 [label="λ"]
 	q4 -> q5 [label=b]
-	q6 -> q4 [label="λ"]
 	q6 -> q7 [label="λ"]
-	q5 -> q4 [label="λ"]
+	q6 -> q4 [label="λ"]
 	q5 -> q7 [label="λ"]
+	q5 -> q4 [label="λ"]
 	q3 -> q6 [label="λ"]
 }
