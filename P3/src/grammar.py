@@ -87,7 +87,6 @@ class Grammar:
         Returns:
             First set of str.
         """
-        #print(f"Computing first for {sentence}")
         if len(sentence) == 0: return set([''])
 
         first = set()
@@ -141,6 +140,35 @@ class Grammar:
         Returns:
             LL(1) table for the grammar, or None if the grammar is not LL(1).
         """
+        Table = LL1Table(self.non_terminals, self.terminals)
+
+        for non_terminal, productions in self.productions.items():
+            for production in productions:
+                first_p = self.compute_first(production)
+                for f_terminal in first_p:
+                    if f_terminal == '':
+                        next_p = set()
+                        #next_p = self.compute_follow(non_terminal)
+                        for n_terminal in next_p:
+                            if n_terminal == '': raise Exception(f"Error en la función follow: el conjunto Follow de {non_terminal} contiene lambda")
+                            
+                            if not(n_terminal in self.terminals or n_terminal == '$'):
+                                if n_terminal not in self.non_terminals: raise ValueError(f"Invalid symbol: {n_terminal}")
+                                continue
+                            
+                            if Table.cells[non_terminal][n_terminal] is not None: return None
+
+                            Table.add_cell(non_terminal, n_terminal, production)
+
+                    if f_terminal not in self.terminals:
+                        if f_terminal not in self.non_terminals:
+                            raise ValueError(f"Invalid symbol: {f_terminal}")
+                        continue
+                    
+                    if Table.cells[non_terminal][f_terminal] is not None:
+                        return None
+
+                    Table.add_cell(non_terminal, f_terminal, production)
 
 	# TO-DO: Complete this method for exercise 5...
 

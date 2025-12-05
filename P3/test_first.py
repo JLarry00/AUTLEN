@@ -33,6 +33,7 @@ class TestFirst(unittest.TestCase):
         """
         
         grammar = GrammarFormat.read(grammar_str)
+        print(grammar)
 
         self._check_first(grammar, "E", {'(', 'i'})
         self._check_first(grammar, "T", {'(', 'i'})
