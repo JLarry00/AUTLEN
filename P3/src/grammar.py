@@ -87,7 +87,36 @@ class Grammar:
         Returns:
             First set of str.
         """
+        #print(f"Computing first for {sentence}")
+        if len(sentence) == 0: return set([''])
 
+        first = set()
+        for s in sentence:
+            if s not in self.non_terminals and s not in self.terminals: raise ValueError(f"Invalid symbol: {s}")
+
+            if s in self.terminals:
+                first.add(s)
+                first.discard('')
+                break
+            
+            first_s = set()
+            for rule in self.productions[s]:
+                if len(rule) == 0:
+                    first_s.add('')
+                    continue
+                elif rule[0] in self.terminals:
+                    first_s.add(rule[0])
+                    continue
+                elif rule[0] in self.non_terminals:
+                    first_s.update(self.compute_first(rule))
+
+            first.update(first_s)
+
+            if '' not in first: break
+
+            if s == sentence[-1] and '' not in first_s: first.discard('')
+
+        return first
 	# TO-DO: Complete this method for exercise 3...
 
 
