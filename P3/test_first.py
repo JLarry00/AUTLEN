@@ -34,16 +34,6 @@ class TestFirst(unittest.TestCase):
         
         grammar = GrammarFormat.read(grammar_str)
 
-        # print(f"Grammar: {grammar}")
-        # set = []
-        # for non_terminal, productions in grammar.productions.items():
-        #     print(f"{non_terminal} -> {productions}")
-        #     for production in productions:
-        #         if len(production) == 0:
-        #             print(f"Added '{production}' to set")
-        #             set.append(production)
-        #             print(f"Set: {set}")
-
         self._check_first(grammar, "E", {'(', 'i'})
         self._check_first(grammar, "T", {'(', 'i'})
         self._check_first(grammar, "X", {'', '+'})
