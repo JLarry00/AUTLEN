@@ -3,18 +3,26 @@ from src.g1_lexer import tokens
 
 # Gramática
 
+
 def p_Language(p):
-    pass
+    """Language : A B C"""
+    p[0] = (p[1]["a"] == p[2]["b"]) and (p[2]["b"] < p[3]["c"])
 
 def p_A(p):
     """A : a A
         | lambda"""
+    if len(p) == 3:
+        p[0] = {"a": 1 + p[2]["a"]}
+    else:
+        p[0] = {"a": 0}
 
-    pass
 def p_B(p):
     """B : b B
         | lambda"""
-    pass
+    if len(p) == 3:
+        p[0] = {"b": 1 + p[2]["b"]}
+    else:
+        p[0] = {"b": 0}
 
 def p_C(p):
     """C : c C
@@ -26,7 +34,7 @@ def p_C(p):
 
 def p_lambda(p):
     """lambda :"""
-    pass  # Producción vacía
+    p[0] = {}
 
 # Manejo de errores sintácticos
 def p_error(p):
@@ -45,4 +53,3 @@ if __name__ == "__main__":
             continue
         result = parser.parse(s)
         print(f"El valor numérico es:", result)
-

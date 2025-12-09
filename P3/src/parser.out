@@ -1,0 +1,177 @@
+Created by PLY version 3.11 (http://www.dabeaz.com/ply)
+
+Grammar
+
+Rule 0     S' -> Language
+Rule 1     Language -> A B C
+Rule 2     A -> a A
+Rule 3     A -> lambda
+Rule 4     B -> b B
+Rule 5     B -> lambda
+Rule 6     C -> c C
+Rule 7     C -> lambda
+Rule 8     lambda -> <empty>
+
+Terminals, with rules where they appear
+
+a                    : 2
+b                    : 4
+c                    : 6
+error                : 
+
+Nonterminals, with rules where they appear
+
+A                    : 1 2
+B                    : 1 4
+C                    : 1 6
+Language             : 0
+lambda               : 3 5 7
+
+Parsing method: LALR
+
+state 0
+
+    (0) S' -> . Language
+    (1) Language -> . A B C
+    (2) A -> . a A
+    (3) A -> . lambda
+    (8) lambda -> .
+
+    a               shift and go to state 3
+    b               reduce using rule 8 (lambda -> .)
+    c               reduce using rule 8 (lambda -> .)
+    $end            reduce using rule 8 (lambda -> .)
+
+    Language                       shift and go to state 1
+    A                              shift and go to state 2
+    lambda                         shift and go to state 4
+
+state 1
+
+    (0) S' -> Language .
+
+
+
+state 2
+
+    (1) Language -> A . B C
+    (4) B -> . b B
+    (5) B -> . lambda
+    (8) lambda -> .
+
+    b               shift and go to state 6
+    c               reduce using rule 8 (lambda -> .)
+    $end            reduce using rule 8 (lambda -> .)
+
+    B                              shift and go to state 5
+    lambda                         shift and go to state 7
+
+state 3
+
+    (2) A -> a . A
+    (2) A -> . a A
+    (3) A -> . lambda
+    (8) lambda -> .
+
+    a               shift and go to state 3
+    b               reduce using rule 8 (lambda -> .)
+    c               reduce using rule 8 (lambda -> .)
+    $end            reduce using rule 8 (lambda -> .)
+
+    A                              shift and go to state 8
+    lambda                         shift and go to state 4
+
+state 4
+
+    (3) A -> lambda .
+
+    b               reduce using rule 3 (A -> lambda .)
+    c               reduce using rule 3 (A -> lambda .)
+    $end            reduce using rule 3 (A -> lambda .)
+
+
+state 5
+
+    (1) Language -> A B . C
+    (6) C -> . c C
+    (7) C -> . lambda
+    (8) lambda -> .
+
+    c               shift and go to state 10
+    $end            reduce using rule 8 (lambda -> .)
+
+    C                              shift and go to state 9
+    lambda                         shift and go to state 11
+
+state 6
+
+    (4) B -> b . B
+    (4) B -> . b B
+    (5) B -> . lambda
+    (8) lambda -> .
+
+    b               shift and go to state 6
+    c               reduce using rule 8 (lambda -> .)
+    $end            reduce using rule 8 (lambda -> .)
+
+    B                              shift and go to state 12
+    lambda                         shift and go to state 7
+
+state 7
+
+    (5) B -> lambda .
+
+    c               reduce using rule 5 (B -> lambda .)
+    $end            reduce using rule 5 (B -> lambda .)
+
+
+state 8
+
+    (2) A -> a A .
+
+    b               reduce using rule 2 (A -> a A .)
+    c               reduce using rule 2 (A -> a A .)
+    $end            reduce using rule 2 (A -> a A .)
+
+
+state 9
+
+    (1) Language -> A B C .
+
+    $end            reduce using rule 1 (Language -> A B C .)
+
+
+state 10
+
+    (6) C -> c . C
+    (6) C -> . c C
+    (7) C -> . lambda
+    (8) lambda -> .
+
+    c               shift and go to state 10
+    $end            reduce using rule 8 (lambda -> .)
+
+    C                              shift and go to state 13
+    lambda                         shift and go to state 11
+
+state 11
+
+    (7) C -> lambda .
+
+    $end            reduce using rule 7 (C -> lambda .)
+
+
+state 12
+
+    (4) B -> b B .
+
+    c               reduce using rule 4 (B -> b B .)
+    $end            reduce using rule 4 (B -> b B .)
+
+
+state 13
+
+    (6) C -> c C .
+
+    $end            reduce using rule 6 (C -> c C .)
+
