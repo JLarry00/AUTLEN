@@ -3,7 +3,6 @@ from src.g1_lexer import tokens
 
 # Gramática
 
-
 def p_Language(p):
     pass
 
