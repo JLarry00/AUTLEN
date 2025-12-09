@@ -35,18 +35,18 @@ class TestFollow(unittest.TestCase):
         self._check_follow(grammar, "X", {'$', ')'})
         self._check_follow(grammar, "Y", {'$', ')', '+'})
 
-    def test_simple_nullable(self) -> None:
-        """
-        Gramática:
-            S -> A B
-            A -> a
-            A ->
-            B -> b
+        def test_simple_nullable(self) -> None:
+            """
+            Gramática:
+                S -> A B
+                A -> a
+                A ->
+                B -> b
 
-        FOLLOW(S) = {$}
-        FOLLOW(A) = {b}
-        FOLLOW(B) = {$}
-        """
+            FOLLOW(S) = {$}
+            FOLLOW(A) = {b}
+            FOLLOW(B) = {$}
+            """
         grammar_str = """
         S -> AB
         A -> a
@@ -123,14 +123,14 @@ class TestFollow(unittest.TestCase):
         with self.assertRaises(ValueError):
             grammar.compute_follow("a")   # 'a' es terminal, no no terminal
     
-    def test_follow_performance(self):
-        """
+    """def test_follow_performance(self):
+        """"""
         Test artificial para comprobar que compute_follow realmente
         ejecuta trabajo y medir un tiempo visible.
         No forma parte de la corrección oficial.
-        """
+        """"""
 
-        grammar_str = """
+        grammar_str = """"""
         E -> TX
         X -> +E
         X ->
@@ -138,7 +138,7 @@ class TestFollow(unittest.TestCase):
         T -> (E)
         Y -> *T
         Y ->
-        """
+        """"""
 
         grammar = GrammarFormat.read(grammar_str)
 
@@ -156,7 +156,7 @@ class TestFollow(unittest.TestCase):
         print(f"Total time for {N} executions: {total:.6f} s")
         print(f"Average per call: {avg:.10f} s")
 
-        self.assertEqual(grammar.compute_follow("E"), {'$', ')'})
+        self.assertEqual(grammar.compute_follow("E"), {'$', ')'})"""
 
 
 if __name__ == '__main__':

@@ -192,50 +192,36 @@ class Grammar:
         Returns:
             LL(1) table for the grammar, or None if the grammar is not LL(1).
         """
-        # print(f"195 => Getting LL(1) table for grammar: {self}")
-        Table = LL1Table(self.non_terminals, self.terminals | {'$'})
-        # print(f"197 => Table: {Table}")
-        for non_terminal, productions in self.productions.items():
-            # print(f"199     => Non-terminal: {non_terminal}, Productions: {productions}")
-            for production in productions:
-                # print(f"201         => Production: {production}")
-                first_p = self.compute_first(production)
-                # print(f"203         => First(production): {first_p}")
-                for f_terminal in first_p:
-                    # print(f"205             => Terminal: {f_terminal}")
-                    if f_terminal == '':
-                        # print(f"207                 => Empty terminal")
-                        next_p = self.compute_follow(non_terminal)
-                        # print(f"209                 => Next productions of {non_terminal}: {next_p}")
-                        for n_terminal in next_p:
-                            # print(f"211                     => Non-terminal: {n_terminal}")
-                            if n_terminal == '': raise Exception(f"Error en la función follow: el conjunto Follow de {non_terminal} contiene lambda")
+        Table = LL1Table(self.non_terminals, self.terminals)
 
-                            # print(f"213                     => Non-terminal: {n_terminal} in terminals or $")
+        for non_terminal, productions in self.productions.items():
+            for production in productions:
+                first_p = self.compute_first(production)
+                for f_terminal in first_p:
+                    if f_terminal == '':
+                        next_p = set()
+                        #next_p = self.compute_follow(non_terminal)
+                        for n_terminal in next_p:
+                            if n_terminal == '': raise Exception(f"Error en la función follow: el conjunto Follow de {non_terminal} contiene lambda")
+                            
                             if not(n_terminal in self.terminals or n_terminal == '$'):
-                                # print(f"215                         => Invalid symbol: {n_terminal}")
                                 if n_terminal not in self.non_terminals: raise ValueError(f"Invalid symbol: {n_terminal}")
                                 continue
                             
                             if Table.cells[non_terminal][n_terminal] is not None: return None
 
                             Table.add_cell(non_terminal, n_terminal, production)
-                            # print(f"223                     => Added cell: {non_terminal}, {n_terminal}, {production}")
-                    else:
-                        if f_terminal not in self.terminals:
-                            # print(f"227                 => Non-terminal: {f_terminal}")
-                            if f_terminal not in self.non_terminals:
-                                # print(f"229                     => Invalid symbol: {f_terminal}")
-                                raise ValueError(f"Invalid symbol: {f_terminal}")
-                            continue
-                        
-                        if Table.cells[non_terminal][f_terminal] is not None:
-                            # print(f"233                 => Repeated cell: {non_terminal}, {f_terminal}")
-                            return None
 
-                        Table.add_cell(non_terminal, f_terminal, production)
-                        # print(f"237             => Added cell: {non_terminal}, {f_terminal}, {production}")
-        return Table
+                    if f_terminal not in self.terminals:
+                        if f_terminal not in self.non_terminals:
+                            raise ValueError(f"Invalid symbol: {f_terminal}")
+                        continue
+                    
+                    if Table.cells[non_terminal][f_terminal] is not None:
+                        return None
+
+                    Table.add_cell(non_terminal, f_terminal, production)
+
 	# TO-DO: Complete this method for exercise 5...
 
 

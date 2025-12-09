@@ -37,10 +37,16 @@ class TestAnalyze(unittest.TestCase):
             self.assertTrue(table is not None)
             if table is not None:
                 if exception is None:
+                    if table.analyze(input_string, start) is not None: print("✅", end="")
+                    else: print("❌", end="")
                     self.assertTrue(table.analyze(input_string, start) is not None)
                 else:
                     with self.assertRaises(exception):
-                        table.analyze(input_string, start)
+                        try:
+                            table.analyze(input_string, start)
+                        except exception:
+                            print("✅", end="")
+                            raise
 
     def _check_parse_tree(
             self,
@@ -76,6 +82,7 @@ class TestAnalyze(unittest.TestCase):
         for (nt, t, body) in cells:
             table.add_cell(nt, t, body)
 
+        print()
         # Casos típicos válidos
         self._check_analyze(table, "i*i$", "E")
         self._check_analyze(table, "i*i+i$", "E")
@@ -110,32 +117,96 @@ class TestAnalyze(unittest.TestCase):
         self._check_analyze(table, "i * i $", "E", exception=SyntaxError)
         # Expresión imposible con dos operadores seguidos
         self._check_analyze(table, "i**i$", "E", exception=SyntaxError)
-
         print()
 
 
-    # def test_case2(self) -> None:
-    #     """Test for syntax analysis from grammar."""
-    #     grammar_str = """
-    #     E -> TX
-    #     X -> +E
-    #     X ->
-    #     T -> iY
-    #     T -> (E)
-    #     Y -> *T
-    #     Y ->
-    #     """
+    def test_case2(self) -> None:
+        """Test for syntax analysis from grammar."""
+        grammar_str = """
+        E -> TX
+        X -> +E
+        X ->
+        T -> iY
+        T -> (E)
+        Y -> *T
+        Y ->
+        """
 
-    #     grammar = GrammarFormat.read(grammar_str)
+        grammar = GrammarFormat.read(grammar_str)
 
-    #     self._check_analyze_from_grammar(grammar, "i*i$", "E")
-    #     self._check_analyze_from_grammar(grammar, "i*i+i$", "E")
-    #     self._check_analyze_from_grammar(grammar, "i*i+i+(i*i)$", "E")
-    #     self._check_analyze_from_grammar(grammar, "a", "E", exception=SyntaxError)
-    #     self._check_analyze_from_grammar(grammar, "(i$", "E", exception=SyntaxError)
-    #     self._check_analyze_from_grammar(grammar, "i*i$i", "E", exception=SyntaxError)
-    #     self._check_analyze_from_grammar(grammar, "i*i", "E", exception=SyntaxError)
-    #     self._check_analyze_from_grammar(grammar, "+i*i", "E", exception=SyntaxError)
+        # first_e = grammar.compute_first("TX")
+        # print(f"     => First(E -> TX): {first_e}")
+        # first_x = grammar.compute_first("+E")
+        # print(f"     => First(X -> +E): {first_x}")
+        # first_ = grammar.compute_first("")
+        # print(f"     => First(X -> ): {first_}")
+        # first_t = grammar.compute_first("iY")
+        # print(f"     => First(T -> iY): {first_t}")
+        # first_y = grammar.compute_first("(E)")
+        # print(f"     => First(T -> (E)): {first_y}")
+        # follow_e = grammar.compute_first("*T")
+        # print(f"     => First(Y -> *T): {follow_e}")
+        # first_ = grammar.compute_first("")
+        # print(f"     => First(Y -> ): {first_}")
+
+        # follow_e = grammar.compute_follow("E")
+        # print(f"     => Follow(E): {follow_e}")
+        # follow_x = grammar.compute_follow("X")
+        # print(f"     => Follow(X): {follow_x}")
+        # follow_t = grammar.compute_follow("T")
+        # print(f"     => Follow(T): {follow_t}")
+        # follow_y = grammar.compute_follow("Y")
+        # print(f"     => Follow(Y): {follow_y}")
+
+        print()
+        self._check_analyze_from_grammar(grammar, "i*i$", "E")
+        self._check_analyze_from_grammar(grammar, "i*i+i$", "E")
+        self._check_analyze_from_grammar(grammar, "i*i+i+(i*i)$", "E")
+        self._check_analyze_from_grammar(grammar, "a", "E", exception=SyntaxError)
+        self._check_analyze_from_grammar(grammar, "(i$", "E", exception=SyntaxError)
+        self._check_analyze_from_grammar(grammar, "i*i$i", "E", exception=SyntaxError)
+        self._check_analyze_from_grammar(grammar, "i*i", "E", exception=SyntaxError)
+        self._check_analyze_from_grammar(grammar, "+i*i", "E", exception=SyntaxError)
+
+        # Valid regular cases
+        self._check_analyze_from_grammar(grammar, "i*i$", "E")  # simple multiplication
+        self._check_analyze_from_grammar(grammar, "i+i$", "E")  # simple addition
+        self._check_analyze_from_grammar(grammar, "(i)$", "E")  # simple parenthesized
+
+        # More complex valid cases
+        self._check_analyze_from_grammar(grammar, "i*i+i$", "E")  # multiplication then addition
+        self._check_analyze_from_grammar(grammar, "i*i+i+(i*i)$", "E")  # nested parentheses
+        self._check_analyze_from_grammar(grammar, "(((i)))$", "E")  # deeply nested
+
+        # Edge and unusual cases - valid
+        self._check_analyze_from_grammar(grammar, "i$", "E")        # Single i, minimal
+        self._check_analyze_from_grammar(grammar, "i+i+i$", "E")    # chain addition
+        self._check_analyze_from_grammar(grammar, "i*i*i$", "E")    # chain multiplication
+
+        # Edge - invalid syntax or input
+        self._check_analyze_from_grammar(grammar, "a", "E", exception=SyntaxError)    # invalid character
+        self._check_analyze_from_grammar(grammar, "", "E", exception=SyntaxError)     # completely empty
+        self._check_analyze_from_grammar(grammar, "$", "E", exception=SyntaxError)    # just end marker
+        self._check_analyze_from_grammar(grammar, "()", "E", exception=SyntaxError)   # empty parentheses
+        self._check_analyze_from_grammar(grammar, "($", "E", exception=SyntaxError)   # opening parenthesis with no expression
+        self._check_analyze_from_grammar(grammar, "(i$", "E", exception=SyntaxError)  # missing closing parenthesis
+
+        self._check_analyze_from_grammar(grammar, "i*i$i", "E", exception=SyntaxError)  # suffix after correct expr
+        self._check_analyze_from_grammar(grammar, "i*i", "E", exception=SyntaxError)    # missing end marker
+        self._check_analyze_from_grammar(grammar, "+i*i", "E", exception=SyntaxError)   # starts with operator
+        self._check_analyze_from_grammar(grammar, "*i$", "E", exception=SyntaxError)    # starts with operator
+        self._check_analyze_from_grammar(grammar, "i++i$", "E", exception=SyntaxError)  # repeated operator
+
+        # Terminal errors
+        self._check_analyze_from_grammar(grammar, "i*i)$((", "E", exception=SyntaxError)  # excess unmatched parens
+        self._check_analyze_from_grammar(grammar, "i(i)$", "E", exception=SyntaxError)    # invalid parenthesis use
+
+        # Token separation error (spaces are not terminals)
+        self._check_analyze_from_grammar(grammar, "i * i $", "E", exception=SyntaxError)  # spaces
+
+        # Test with only parentheses
+        self._check_analyze_from_grammar(grammar, "())$", "E", exception=SyntaxError)     # only parentheses
+        print()
 
     # def test_case3(self) -> None:
     #     """Test for parse tree construction."""

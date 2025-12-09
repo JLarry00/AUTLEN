@@ -50,7 +50,11 @@ class TestFirst(unittest.TestCase):
         self._check_first(grammar, "()", {'('})  # only terminals
         self._check_first(grammar, "++", {'+'})  # repeated terminal
         self._check_first(grammar, "TTT", {'(', 'i'})
-        with self.assertRaises(ValueError): self._check_first(grammar, "XYZ", {'', '+', '*'})  # Z no está en la gramática, debe dar error
+        try: grammar.compute_first("XYZ")
+        except ValueError as e:
+            print(f"     => First(XYZ) raised ValueError as expected: {e}")
+        else:
+            self.fail("Expected ValueError for compute_first('XYZ')")
         self._check_first(grammar, "YXTX", {'+', '*', '', '(', 'i'})
         self._check_first(grammar, "YX()", {'+', '*', '('})
         self._check_first(grammar, "T", {'(', 'i'})
