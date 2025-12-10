@@ -13,11 +13,8 @@ def p_roman(p):
     # Calculate total value
     total_val = hundreds_attrs['val'] * 100 + tens_attrs['val'] * 10 + units_attrs['val']
     
-    # Validate: all counts <= 3 and all sub-components valid
-    is_valid = (hundreds_attrs['count_c'] <= 3 and 
-                tens_attrs['count_x'] <= 3 and 
-                units_attrs['count_i'] <= 3 and
-                hundreds_attrs['valid'] and 
+    # Validate: all sub-components valid
+    is_valid = (hundreds_attrs['valid'] and 
                 tens_attrs['valid'] and 
                 units_attrs['valid'])
     
@@ -38,35 +35,37 @@ def p_hundreds(p):
     elif len(p) == 3:
         if p[1] == 'C' and p[2] == 'D':
             # CD = 400
-            p[0] = {"val": 4, "count_c": 0, "valid": True}
+            p[0] = {"val": 4, "valid": True}
         elif p[1] == 'C' and p[2] == 'M':
             # CM = 900
-            p[0] = {"val": 9, "count_c": 0, "valid": True}
+            p[0] = {"val": 9, "valid": True}
         elif p[1] == 'D':
             # D LowHundreds = 500 + (0-300) = 500-800
             low_hundreds_attrs = p[2]
+            # Validate: low_hundreds val must be 0-3 (0-3 C's)
+            is_valid = low_hundreds_attrs['valid'] and low_hundreds_attrs['val'] <= 3
             p[0] = {
                 "val": 5 + low_hundreds_attrs['val'],
-                "count_c": low_hundreds_attrs['count_c'],
-                "valid": low_hundreds_attrs['valid'] and low_hundreds_attrs['count_c'] <= 3
+                "valid": is_valid
             }
 
 
 def p_low_hundreds(p):
-    """low_hundreds : low_hundreds C
+    """low_hundreds : C low_hundreds
                     | lambda"""
     if len(p) == 3:
         # Recursive case: LowHundreds C
         prev_attrs = p[1]
-        count_c = prev_attrs['count_c'] + 1
+        count_c = prev_attrs['val'] + 1
+        # Validate: count must be <= 3
+        is_valid = prev_attrs['valid'] and count_c <= 3
         p[0] = {
             "val": count_c,
-            "count_c": count_c,
-            "valid": prev_attrs['valid'] and count_c <= 3
+            "valid": is_valid
         }
     else:
         # Lambda case
-        p[0] = {"val": 0, "count_c": 0, "valid": True}
+        p[0] = {"val": 0, "valid": True}
 
 
 def p_tens(p):
@@ -80,35 +79,37 @@ def p_tens(p):
     elif len(p) == 3:
         if p[1] == 'X' and p[2] == 'L':
             # XL = 40
-            p[0] = {"val": 4, "count_x": 0, "valid": True}
+            p[0] = {"val": 4, "valid": True}
         elif p[1] == 'X' and p[2] == 'C':
             # XC = 90
-            p[0] = {"val": 9, "count_x": 0, "valid": True}
+            p[0] = {"val": 9, "valid": True}
         elif p[1] == 'L':
             # L LowTens = 50 + (0-30) = 50-80
             low_tens_attrs = p[2]
+            # Validate: low_tens val must be 0-3 (0-3 X's)
+            is_valid = low_tens_attrs['valid'] and low_tens_attrs['val'] <= 3
             p[0] = {
                 "val": 5 + low_tens_attrs['val'],
-                "count_x": low_tens_attrs['count_x'],
-                "valid": low_tens_attrs['valid'] and low_tens_attrs['count_x'] <= 3
+                "valid": is_valid
             }
 
 
 def p_low_tens(p):
-    """low_tens : low_tens X
+    """low_tens : X low_tens
                 | lambda"""
     if len(p) == 3:
         # Recursive case: LowTens X
         prev_attrs = p[1]
-        count_x = prev_attrs['count_x'] + 1
+        count_x = prev_attrs['val'] + 1
+        # Validate: count must be <= 3
+        is_valid = prev_attrs['valid'] and count_x <= 3
         p[0] = {
             "val": count_x,
-            "count_x": count_x,
-            "valid": prev_attrs['valid'] and count_x <= 3
+            "valid": is_valid
         }
     else:
         # Lambda case
-        p[0] = {"val": 0, "count_x": 0, "valid": True}
+        p[0] = {"val": 0, "valid": True}
 
 
 def p_units(p):
@@ -122,41 +123,43 @@ def p_units(p):
     elif len(p) == 3:
         if p[1] == 'I' and p[2] == 'V':
             # IV = 4
-            p[0] = {"val": 4, "count_i": 0, "valid": True}
+            p[0] = {"val": 4, "valid": True}
         elif p[1] == 'I' and p[2] == 'X':
             # IX = 9
-            p[0] = {"val": 9, "count_i": 0, "valid": True}
+            p[0] = {"val": 9, "valid": True}
         elif p[1] == 'V':
             # V LowUnits = 5 + (0-3) = 5-8
             low_units_attrs = p[2]
+            # Validate: low_units val must be 0-3 (0-3 I's)
+            is_valid = low_units_attrs['valid'] and low_units_attrs['val'] <= 3
             p[0] = {
                 "val": 5 + low_units_attrs['val'],
-                "count_i": low_units_attrs['count_i'],
-                "valid": low_units_attrs['valid'] and low_units_attrs['count_i'] <= 3
+                "valid": is_valid
             }
 
 
 def p_low_units(p):
-    """low_units : low_units I
+    """low_units : I low_units
                  | lambda"""
     if len(p) == 3:
         # Recursive case: LowUnits I
         prev_attrs = p[1]
-        count_i = prev_attrs['count_i'] + 1
+        count_i = prev_attrs['val'] + 1
+        # Validate: count must be <= 3
+        is_valid = prev_attrs['valid'] and count_i <= 3
         p[0] = {
             "val": count_i,
-            "count_i": count_i,
-            "valid": prev_attrs['valid'] and count_i <= 3
+            "valid": is_valid
         }
     else:
         # Lambda case
-        p[0] = {"val": 0, "count_i": 0, "valid": True}
+        p[0] = {"val": 0, "valid": True}
 
 
 # Definir lambda
 def p_lambda(p):
     'lambda :'
-    p[0] = {"val": 0, "count_c": 0, "count_x": 0, "count_i": 0, "valid": True}
+    p[0] = {"val": 0, "valid": True}
 
 # Manejo de errores sintácticos
 def p_error(p):
