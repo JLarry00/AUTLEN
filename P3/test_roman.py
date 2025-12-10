@@ -1,6 +1,6 @@
 import unittest
 
-from src.roman_parser import *
+from src.roman_parser2 import *
 
 class TestRommanGrammar(unittest.TestCase):
     def _check_analyze(self, input_string, int_value, valid):
