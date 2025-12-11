@@ -303,7 +303,7 @@ class LL1Table:
         else:
             self.cells[non_terminal][terminal] = cell_body
 
-    def analyze(self, input_string: str, start: str) -> ParseTree:
+    def analyze2(self, input_string: str, start: str) -> ParseTree:
         """
         Method to analyze a string using the LL(1) table.
 
@@ -347,6 +347,62 @@ class LL1Table:
         
         return True
 	# TO-DO: Complete this method for exercise 2...
+
+    def  analyze(self, input_string: str, start: str) -> ParseTree:
+        """
+        Method to analyze a string using the LL(1) table.
+
+        Args:
+            input_string: string to analyze.
+            start: initial symbol.
+
+        Returns:
+            ParseTree object with either the parse tree (if the elective exercise is solved)
+            or an empty tree (if the elective exercise is not considered).
+
+        Raises:
+            SyntaxError: if the input string is not syntactically correct.
+        """
+        if len(input_string) == 0: raise(SyntaxError(f"Input string not valid: empty string"))
+        if input_string[-1] != "$": raise(SyntaxError(f"Input string not valid: missing $ at the end"))
+        st = deque([start])
+
+        input = deque(input_string)
+        tree = ParseTree(start)
+        stack = deque([tree, ParseTree("$")])
+
+        while len(stack) > 0:
+            ptree = stack.popleft()
+            elem = ptree.root
+            c = input[0]
+            if c not in self.terminals: raise(SyntaxError(f"Unknown symbol: {c}"))
+            if elem in self.terminals:
+                if elem == c: input.popleft()
+                else: raise(SyntaxError(f"Terminal char in stack ({elem}) and input ({c}) differ"))
+
+            elif elem in self.non_terminals:
+                rule = self.cells[elem][c]
+
+                if rule is None: raise(SyntaxError(f"No production rule for {elem} and {c}"))
+
+                elif rule != "":
+                    trees = deque()
+                    for char in reversed(rule):
+                        new_tree = ParseTree(char)
+                        stack.appendleft(new_tree)
+                        trees.appendleft(new_tree)
+                    ptree.add_children(trees)
+                else:
+                    empty_tree = ParseTree("λ")
+                    ptree.add_children([empty_tree])
+
+            else:
+                raise(SyntaxError(f"Unknown symbol: {elem}"))
+
+        if c != "$": raise(SyntaxError(f"Input string not fully analyzed"))
+        if len(input) > 1: raise(SyntaxError(f"Input string not fully analyzed"))
+        
+        return tree
     
     
 class ParseTree():
@@ -365,6 +421,31 @@ class ParseTree():
         return (
             f"{type(self).__name__}({self.root!r}: {self.children})"
         )
+    
+    def __str__(self) -> str:
+        # Tree representation using unicode box-drawing characters,
+        # fix: don't add initial 3-space padding for children of the root node.
+        def _str_tree(node, prefix="", is_last=True, is_root=False):
+            lines = []
+            if is_root:
+                # No connector or prefix for root
+                lines.append(str(node.root))
+            else:
+                connector = "└── " if is_last else "├── "
+                lines.append(prefix + connector + str(node.root))
+            if node.children:
+                child_count = len(node.children)
+                for i, child in enumerate(node.children):
+                    is_last_child = (i == child_count - 1)
+                    # For children of the root node, do not add prefix (to avoid extra spaces)
+                    if is_root:
+                        new_prefix = " "
+                    else:
+                        new_prefix = prefix + ("    " if is_last else "│   ")
+                    lines.append(_str_tree(child, new_prefix, is_last_child, False))
+            return "\n".join(lines)
+        # Render with is_root=True for the root node
+        return _str_tree(self, "", True, True)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, type(self)):

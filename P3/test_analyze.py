@@ -58,10 +58,19 @@ class TestAnalyze(unittest.TestCase):
     ) -> None:
         with self.subTest(string=input_string):
             if exception is None:
-                self.assertEqual(table.analyze(input_string, start), tree)
+                res_tree = table.analyze(input_string, start)
+                if res_tree == tree:
+                    print("✅", end="")
+                else:
+                    print("❌", end="")
+                self.assertEqual(res_tree, tree)
             else:
                 with self.assertRaises(exception):
-                    table.analyze(input_string, start)
+                    try:
+                        table.analyze(input_string, start)
+                    except exception:
+                        print("✅", end="")
+                        raise
 
     def test_case1(self) -> None:
         """Test for syntax analysis from table."""
@@ -208,38 +217,93 @@ class TestAnalyze(unittest.TestCase):
         self._check_analyze_from_grammar(grammar, "())$", "E", exception=SyntaxError)     # only parentheses
         print()
 
-    # def test_case3(self) -> None:
-    #     """Test for parse tree construction."""
-    #     terminals = {"(", ")", "i", "+", "*", "$"}
-    #     non_terminals = {"E", "T", "X", "Y"}
-    #     cells = [('E', '(', 'TX'),
-    #              ('E', 'i', 'TX'),
-    #              ('T', '(', '(E)'),
-    #              ('T', 'i', 'iY'),
-    #              ('X', '+', '+E'),
-    #              ('X', ')', ''),
-    #              ('X', '$', ''),
-    #              ('Y', '*', '*T'),
-    #              ('Y', '+', ''),
-    #              ('Y', ')', ''),
-    #              ('Y', '$', '')]
-    #     table = LL1Table(non_terminals, terminals)
-    #     for (nt, t, body) in cells:
-    #         table.add_cell(nt, t, body)
+    def test_case3(self) -> None:
+        """Test for parse tree construction."""
+        terminals = {"(", ")", "i", "+", "*", "$"}
+        non_terminals = {"E", "T", "X", "Y"}
+        cells = [('E', '(', 'TX'),
+                 ('E', 'i', 'TX'),
+                 ('T', '(', '(E)'),
+                 ('T', 'i', 'iY'),
+                 ('X', '+', '+E'),
+                 ('X', ')', ''),
+                 ('X', '$', ''),
+                 ('Y', '*', '*T'),
+                 ('Y', '+', ''),
+                 ('Y', ')', ''),
+                 ('Y', '$', '')]
+        table = LL1Table(non_terminals, terminals)
+        for (nt, t, body) in cells:
+            table.add_cell(nt, t, body)
 
-    #     t01 = ParseTree("λ")
-    #     t02 = ParseTree("X", [t01])
-    #     t03 = ParseTree("λ")
-    #     t04 = ParseTree("Y", [t03])
-    #     t05 = ParseTree("i")
-    #     t06 = ParseTree("T", [t05, t04])
-    #     t07 = ParseTree("*")
-    #     t08 = ParseTree("Y", [t07, t06])
-    #     t09 = ParseTree("i")
-    #     t10 = ParseTree("T", [t09, t08])
-    #     tree = ParseTree("E", [t10, t02])
-        
-    #     self._check_parse_tree(table, "i*i$", "E", tree)
+        print()
+
+        t01 = ParseTree("λ")
+        t02 = ParseTree("X", [t01])
+        t03 = ParseTree("λ")
+        t04 = ParseTree("Y", [t03])
+        t05 = ParseTree("i")
+        t06 = ParseTree("T", [t05, t04])
+        t07 = ParseTree("*")
+        t08 = ParseTree("Y", [t07, t06])
+        t09 = ParseTree("i")
+        t10 = ParseTree("T", [t09, t08])
+        tree = ParseTree("E", [t10, t02])
+        self._check_parse_tree(table, "i*i$", "E", tree)
+
+        t01 = ParseTree("λ")
+        t02 = ParseTree("X", [t01])
+        t03 = ParseTree("λ")
+        t04 = ParseTree("Y", [t03])
+        t05 = ParseTree("i")
+        t06 = ParseTree("T", [t05, t04])
+        t07 = ParseTree("+")
+        t13 = ParseTree("λ")
+        t12 = ParseTree("X", [t13])
+        t11 = ParseTree("λ")
+        t10 = ParseTree("Y", [t11])
+        t09 = ParseTree("i")
+        t08 = ParseTree("T", [t09, t10])
+        t07b = ParseTree("E", [t08, t12])
+        t06b = ParseTree("X", [t07, t07b])
+        tree = ParseTree("E", [t06, t06b])
+        self._check_parse_tree(table, "i+i$", "E", tree)
+
+        t01 = ParseTree("λ")
+        t02 = ParseTree("Y", [t01])
+        t03 = ParseTree("i")
+        t04 = ParseTree("T", [t03, t02])
+        t05 = ParseTree("*")
+        t06 = ParseTree("T", [t04, t05])
+        t07 = ParseTree("λ")
+        t08 = ParseTree("Y", [t07])
+        t09 = ParseTree("i")
+        t10 = ParseTree("T", [t09, t08])
+        t11 = ParseTree("*")
+        t12 = ParseTree("T", [t10, t11])
+        t13 = ParseTree("Y", [t11, t10])
+
+        t01 = ParseTree("λ")
+        t02 = ParseTree("Y", [t01])
+        t03 = ParseTree("i")
+        t04 = ParseTree("T", [t03, t02])
+        t05 = ParseTree("*")
+        t06 = ParseTree("Y", [t05, t04])
+        t07 = ParseTree("i")
+        t08 = ParseTree("T", [t07, t06])
+        t09 = ParseTree("+")
+        t10 = ParseTree("λ")
+        t11 = ParseTree("Y", [t10])
+        t12 = ParseTree("i")
+        t13 = ParseTree("T", [t12, t11])
+        t14 = ParseTree("X", [t10])
+        t15 = ParseTree("E", [t13, t14])
+        t16 = ParseTree("X", [t09, t15])
+
+        tree = ParseTree("E", [t08, t16])
+        self._check_parse_tree(table, "i*i+i$", "E", tree)
+
+        print()
 
 if __name__ == '__main__':
     unittest.main()
