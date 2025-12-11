@@ -1,0 +1,115 @@
+=========================================
+1. GRAMÁTICA 1 (Reglas de producción)
+=========================================
+S' -> R
+R  -> H T U
+H  -> Lh | C D | D Lh | C M
+Lh -> Lh C | lambda
+T  -> Lt | X L | L Lt | X C
+Lt -> Lt X | lambda
+U  -> Lu | I V | V Lu | I X
+Lu -> Lu I | lambda
+
+(Nota: 'lambda' representa la cadena vacía)
+
+=========================================
+2. ESTADOS Y CONJUNTOS DE ÍTEMS
+=========================================
+
+--- ESTADO S0 ---
+S' -> .R       , $
+R  -> .H T U   , $
+H  -> .Lh      , L/X/I/V/$
+H  -> .C D     , L/X/I/V/$
+H  -> .D Lh    , L/X/I/V/$
+H  -> .C M     , L/X/I/V/$
+Lh -> .Lh C    , L/X/I/V/$
+Lh -> .        , L/X/I/V/$
+
+--- ESTADO S0R (Transición con R) ---
+S' -> R.       , $
+
+--- ESTADO S0H (Transición con H) ---
+R  -> H.T U    , $
+T  -> .Lt      , I/V/$
+T  -> .X L     , I/V/$
+T  -> .L Lt    , I/V/$
+T  -> .X C     , I/V/$
+Lt -> .Lt X    , I/V/$
+Lt -> .        , I/V/$
+
+--- ESTADO S0Lh (Transición con Lh) ---
+H  -> Lh.      , L/X/I/V/$
+Lh -> Lh.C     , L/X/I/V/$
+
+--- ESTADO S0C (Transición con C) ---
+H  -> C.D      , L/X/I/V/$
+H  -> C.M      , L/X/I/V/$
+
+--- ESTADO S0D (Transición con D) ---
+H  -> D.Lh     , L/X/I/V/$
+Lh -> .Lh C    , L/X/I/V/$
+Lh -> .        , L/X/I/V/$
+
+
+
+
+
+
+
+
+
+=========================================
+1. GRAMÁTICA (Reglas de producción)
+=========================================
+S' -> R
+R  -> H T U
+H  -> Lh | C D | D Lh | C M
+Lh -> C Lh | lambda
+T  -> Lt | X L | L Lt | X C
+Lt -> X Lt | lambda
+U  -> Lu | I V | V Lu | I X
+Lu -> I Lu | lambda
+
+(Nota: 'lambda' representa la cadena vacía)
+
+=========================================
+2. ESTADOS Y CONJUNTOS DE ÍTEMS
+=========================================
+
+--- ESTADO S0 ---
+S' -> .R       , $
+R  -> .H T U   , $
+H  -> .Lh      , L/X/I/V/$
+H  -> .C D     , L/X/I/V/$
+H  -> .D Lh    , L/X/I/V/$
+H  -> .C M     , L/X/I/V/$
+Lh -> .C Lh    , L/X/I/V/$
+Lh -> .        , L/X/I/V/$
+
+--- ESTADO S0R (Transición con R) ---
+S' -> R.       , $
+
+--- ESTADO S0H (Transición con H) ---
+R  -> H.T U    , $
+T  -> .Lt      , I/V/$
+T  -> .X L     , I/V/$
+T  -> .L Lt    , I/V/$
+T  -> .X C     , I/V/$
+Lt -> .X Lt    , I/V/$
+Lt -> .        , I/V/$
+
+--- ESTADO S0Lh (Transición con Lh) ---
+H  -> Lh.      , L/X/I/V/$
+
+--- ESTADO S0C (Transición con C) ---
+H  -> C.D      , L/X/I/V/$
+H  -> C.M      , L/X/I/V/$
+Lh -> C.Lh     , L/X/I/V/$
+Lh -> .C Lh    , L/X/I/V/$
+Lh -> .        , L/X/I/V/$
+
+--- ESTADO S0D (Transición con D) ---
+H  -> D.Lh     , L/X/I/V/$
+Lh -> .C       , L/X/I/V/$   [Nota: Probablemente sea .C Lh]
+Lh -> .        , L/X/I/V/$

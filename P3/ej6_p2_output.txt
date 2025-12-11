@@ -1,0 +1,101 @@
+
+============================================================
+GRAMÁTICA: roman_parser1
+============================================================
+
+CONJUNTOS FIRST:
+------------------------------------------------------------
+FIRST(roman):         ['C', 'D', 'I', 'L', 'V', 'X', 'λ']
+FIRST(hundreds):      ['C', 'D', 'λ']
+FIRST(low_hundreds):  ['λ']
+FIRST(tens):          ['L', 'X', 'λ']
+FIRST(low_tens):      ['λ']
+FIRST(units):         ['I', 'V', 'λ']
+FIRST(low_units):     ['λ']
+
+CONJUNTOS FOLLOW:
+------------------------------------------------------------
+FOLLOW(roman):        ['$']
+FOLLOW(hundreds):     ['$', 'I', 'L', 'V', 'X']
+FOLLOW(low_hundreds): ['$', 'C', 'I', 'L', 'V', 'X']
+FOLLOW(tens):         ['$', 'I', 'V']
+FOLLOW(low_tens):     ['$', 'I', 'V', 'X']
+FOLLOW(units):        ['$']
+FOLLOW(low_units):    ['$', 'I']
+
+
+============================================================
+GRAMÁTICA: roman_parser2
+============================================================
+
+CONJUNTOS FIRST:
+------------------------------------------------------------
+FIRST(roman):         ['C', 'D', 'I', 'L', 'V', 'X', 'λ']
+FIRST(hundreds):      ['C', 'D', 'λ']
+FIRST(low_hundreds):  ['C', 'λ']
+FIRST(tens):          ['L', 'X', 'λ']
+FIRST(low_tens):      ['X', 'λ']
+FIRST(units):         ['I', 'V', 'λ']
+FIRST(low_units):     ['I', 'λ']
+
+CONJUNTOS FOLLOW:
+------------------------------------------------------------
+FOLLOW(roman):        ['$']
+FOLLOW(hundreds):     ['$', 'I', 'L', 'V', 'X']
+FOLLOW(low_hundreds): ['$', 'I', 'L', 'V', 'X']
+FOLLOW(tens):         ['$', 'I', 'V']
+FOLLOW(low_tens):     ['$', 'I', 'V']
+FOLLOW(units):        ['$']
+FOLLOW(low_units):    ['$']
+
+
+============================================================
+DIFERENCIAS ENTRE LAS GRAMÁTICAS:
+============================================================
+
+1. DIFERENCIAS EN PRODUCCIONES:
+------------------------------------------------------------
+G1 (roman_parser1): LEFT-RECURSIVE
+  - LowHundreds → LowHundreds C | λ
+  - LowTens → LowTens X | λ
+  - LowUnits → LowUnits I | λ
+G2 (roman_parser2): RIGHT-RECURSIVE
+  - LowHundreds → C LowHundreds | λ
+  - LowTens → X LowTens | λ
+  - LowUnits → I LowUnits | λ
+
+2. DIFERENCIAS EN CONJUNTOS FIRST:
+------------------------------------------------------------
+FIRST(low_hundreds   ):
+  G1: ['λ']
+  G2: ['C', 'λ']
+  Solo en G2: ['C']
+
+FIRST(low_tens       ):
+  G1: ['λ']
+  G2: ['X', 'λ']
+  Solo en G2: ['X']
+
+FIRST(low_units      ):
+  G1: ['λ']
+  G2: ['I', 'λ']
+  Solo en G2: ['I']
+
+
+3. DIFERENCIAS EN CONJUNTOS FOLLOW:
+------------------------------------------------------------
+FOLLOW(low_hundreds  ):
+  G1: ['$', 'C', 'I', 'L', 'V', 'X']
+  G2: ['$', 'I', 'L', 'V', 'X']
+  Solo en G1: ['C']
+
+FOLLOW(low_tens      ):
+  G1: ['$', 'I', 'V', 'X']
+  G2: ['$', 'I', 'V']
+  Solo en G1: ['X']
+
+FOLLOW(low_units     ):
+  G1: ['$', 'I']
+  G2: ['$']
+  Solo en G1: ['I']
+

@@ -107,6 +107,7 @@ class Grammar:
                     first_s.add(rule[0])
                     continue
                 elif rule[0] in self.non_terminals:
+                    if rule[0] == s: continue
                     first_s.update(self.compute_first(rule))
 
             first.update(first_s)
