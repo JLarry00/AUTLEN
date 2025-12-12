@@ -51,7 +51,7 @@ def p_hundreds(p):
 
 
 def p_low_hundreds(p):
-    """low_hundreds : C low_hundreds
+    """low_hundreds : low_hundreds C
                     | lambda"""
     if len(p) == 3:
         # Recursive case: LowHundreds C
@@ -95,7 +95,7 @@ def p_tens(p):
 
 
 def p_low_tens(p):
-    """low_tens : X low_tens
+    """low_tens : low_tens X
                 | lambda"""
     if len(p) == 3:
         # Recursive case: LowTens X
@@ -139,7 +139,7 @@ def p_units(p):
 
 
 def p_low_units(p):
-    """low_units : I low_units
+    """low_units : low_units I
                  | lambda"""
     if len(p) == 3:
         # Recursive case: LowUnits I
@@ -163,14 +163,7 @@ def p_lambda(p):
 
 # Manejo de errores sintácticos
 def p_error(p):
-    # For shift/reduce conflicts, PLY prefers shift
-    # When we get an error, it might be because we shifted when we should have reduced
-    # We'll let PLY handle recovery automatically
-    if p:
-        # Return None to signal error, but don't print to avoid noise
-        # The parser will try to recover
-        return None
-    return None
+    print(f"Error sintáctico: {p.value if p else 'EOF'}")
 
 # Construir el parser
 parser = yacc.yacc(start='roman')

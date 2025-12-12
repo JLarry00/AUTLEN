@@ -6,9 +6,9 @@ _tabversion = '3.10'
 
 _lr_method = 'LALR'
 
-_lr_signature = 'romanC D I L M V Xroman : hundreds tens unitshundreds : low_hundreds\n                | C D\n                | D low_hundreds\n                | C Mlow_hundreds : C low_hundreds\n                    | lambdatens : low_tens\n            | X L\n            | L low_tens\n            | X Clow_tens : X low_tens\n                | lambdaunits : low_units\n             | I V\n             | V low_units\n             | I Xlow_units : I low_units\n                 | lambdalambda :'
+_lr_signature = 'romanC D I L M V Xroman : hundreds tens unitshundreds : low_hundreds\n                | C D\n                | D low_hundreds\n                | C Mlow_hundreds : low_hundreds C\n                    | lambdatens : low_tens\n            | X L\n            | L low_tens\n            | X Clow_tens : low_tens X\n                | lambdaunits : low_units\n             | I V\n             | V low_units\n             | I Xlow_units : low_units I\n                 | lambdalambda :'
     
-_lr_action_items = {'C':([0,4,5,9,12,],[4,12,12,24,12,]),'D':([0,4,],[5,13,]),'X':([0,2,3,4,5,6,9,10,12,13,14,15,16,19,22,],[-20,9,-2,-20,-20,-7,22,22,-20,-3,-5,-6,-4,29,22,]),'L':([0,2,3,4,5,6,9,12,13,14,15,16,],[-20,10,-2,-20,-20,-7,23,-20,-3,-5,-6,-4,]),'I':([0,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,19,20,22,23,24,25,26,27,],[-20,-20,-2,-20,-20,-7,19,-8,-20,-20,-13,-20,-3,-5,-6,-4,27,27,-20,-9,-11,-12,-10,27,]),'V':([0,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,19,22,23,24,25,26,],[-20,-20,-2,-20,-20,-7,20,-8,-20,-20,-13,-20,-3,-5,-6,-4,28,-20,-9,-11,-12,-10,]),'$end':([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,],[-20,0,-20,-2,-20,-20,-7,-20,-8,-20,-20,-13,-20,-3,-5,-6,-4,-1,-14,-20,-20,-19,-20,-9,-11,-12,-10,-20,-15,-17,-18,-16,]),'M':([4,],[14,]),}
+_lr_action_items = {'C':([0,3,5,6,9,12,15,],[4,12,-20,-7,23,-6,12,]),'D':([0,4,],[5,13,]),'X':([0,2,3,5,6,8,10,11,12,13,14,15,18,21,24,],[-20,9,-2,-20,-7,21,-20,-13,-6,-3,-5,-4,27,-12,21,]),'L':([0,2,3,5,6,9,12,13,14,15,],[-20,10,-2,-20,-7,22,-6,-3,-5,-4,]),'I':([0,2,3,5,6,7,8,10,11,12,13,14,15,17,19,20,21,22,23,24,25,28,],[-20,-20,-2,-20,-7,18,-8,-20,-13,-6,-3,-5,-4,25,-20,-19,-12,-9,-11,-10,-18,25,]),'V':([0,2,3,5,6,7,8,10,11,12,13,14,15,18,21,22,23,24,],[-20,-20,-2,-20,-7,19,-8,-20,-13,-6,-3,-5,-4,26,-12,-9,-11,-10,]),'$end':([0,1,2,3,5,6,7,8,10,11,12,13,14,15,16,17,19,20,21,22,23,24,25,26,27,28,],[-20,0,-20,-2,-20,-7,-20,-8,-20,-13,-6,-3,-5,-4,-1,-14,-20,-19,-12,-9,-11,-10,-18,-15,-17,-16,]),'M':([4,],[14,]),}
 
 _lr_action = {}
 for _k, _v in _lr_action_items.items():
@@ -17,7 +17,7 @@ for _k, _v in _lr_action_items.items():
       _lr_action[_x][_k] = _y
 del _lr_action_items
 
-_lr_goto_items = {'roman':([0,],[1,]),'hundreds':([0,],[2,]),'low_hundreds':([0,4,5,12,],[3,15,16,15,]),'lambda':([0,2,4,5,7,9,10,12,19,20,22,27,],[6,11,6,6,21,11,11,6,21,21,11,21,]),'tens':([2,],[7,]),'low_tens':([2,9,10,22,],[8,25,26,25,]),'units':([7,],[17,]),'low_units':([7,19,20,27,],[18,30,31,30,]),}
+_lr_goto_items = {'roman':([0,],[1,]),'hundreds':([0,],[2,]),'low_hundreds':([0,5,],[3,15,]),'lambda':([0,2,5,7,10,19,],[6,11,6,20,11,20,]),'tens':([2,],[7,]),'low_tens':([2,10,],[8,24,]),'units':([7,],[16,]),'low_units':([7,19,],[17,28,]),}
 
 _lr_goto = {}
 for _k, _v in _lr_goto_items.items():
@@ -27,24 +27,24 @@ for _k, _v in _lr_goto_items.items():
 del _lr_goto_items
 _lr_productions = [
   ("S' -> roman","S'",1,None,None,None),
-  ('roman -> hundreds tens units','roman',3,'p_roman','roman_parser2.py',7),
-  ('hundreds -> low_hundreds','hundreds',1,'p_hundreds','roman_parser2.py',28),
-  ('hundreds -> C D','hundreds',2,'p_hundreds','roman_parser2.py',29),
-  ('hundreds -> D low_hundreds','hundreds',2,'p_hundreds','roman_parser2.py',30),
-  ('hundreds -> C M','hundreds',2,'p_hundreds','roman_parser2.py',31),
-  ('low_hundreds -> C low_hundreds','low_hundreds',2,'p_low_hundreds','roman_parser2.py',54),
-  ('low_hundreds -> lambda','low_hundreds',1,'p_low_hundreds','roman_parser2.py',55),
-  ('tens -> low_tens','tens',1,'p_tens','roman_parser2.py',72),
-  ('tens -> X L','tens',2,'p_tens','roman_parser2.py',73),
-  ('tens -> L low_tens','tens',2,'p_tens','roman_parser2.py',74),
-  ('tens -> X C','tens',2,'p_tens','roman_parser2.py',75),
-  ('low_tens -> X low_tens','low_tens',2,'p_low_tens','roman_parser2.py',98),
-  ('low_tens -> lambda','low_tens',1,'p_low_tens','roman_parser2.py',99),
-  ('units -> low_units','units',1,'p_units','roman_parser2.py',116),
-  ('units -> I V','units',2,'p_units','roman_parser2.py',117),
-  ('units -> V low_units','units',2,'p_units','roman_parser2.py',118),
-  ('units -> I X','units',2,'p_units','roman_parser2.py',119),
-  ('low_units -> I low_units','low_units',2,'p_low_units','roman_parser2.py',142),
-  ('low_units -> lambda','low_units',1,'p_low_units','roman_parser2.py',143),
-  ('lambda -> <empty>','lambda',0,'p_lambda','roman_parser2.py',161),
+  ('roman -> hundreds tens units','roman',3,'p_roman','roman_parser1.py',7),
+  ('hundreds -> low_hundreds','hundreds',1,'p_hundreds','roman_parser1.py',28),
+  ('hundreds -> C D','hundreds',2,'p_hundreds','roman_parser1.py',29),
+  ('hundreds -> D low_hundreds','hundreds',2,'p_hundreds','roman_parser1.py',30),
+  ('hundreds -> C M','hundreds',2,'p_hundreds','roman_parser1.py',31),
+  ('low_hundreds -> low_hundreds C','low_hundreds',2,'p_low_hundreds','roman_parser1.py',54),
+  ('low_hundreds -> lambda','low_hundreds',1,'p_low_hundreds','roman_parser1.py',55),
+  ('tens -> low_tens','tens',1,'p_tens','roman_parser1.py',72),
+  ('tens -> X L','tens',2,'p_tens','roman_parser1.py',73),
+  ('tens -> L low_tens','tens',2,'p_tens','roman_parser1.py',74),
+  ('tens -> X C','tens',2,'p_tens','roman_parser1.py',75),
+  ('low_tens -> low_tens X','low_tens',2,'p_low_tens','roman_parser1.py',98),
+  ('low_tens -> lambda','low_tens',1,'p_low_tens','roman_parser1.py',99),
+  ('units -> low_units','units',1,'p_units','roman_parser1.py',116),
+  ('units -> I V','units',2,'p_units','roman_parser1.py',117),
+  ('units -> V low_units','units',2,'p_units','roman_parser1.py',118),
+  ('units -> I X','units',2,'p_units','roman_parser1.py',119),
+  ('low_units -> low_units I','low_units',2,'p_low_units','roman_parser1.py',142),
+  ('low_units -> lambda','low_units',1,'p_low_units','roman_parser1.py',143),
+  ('lambda -> <empty>','lambda',0,'p_lambda','roman_parser1.py',161),
 ]

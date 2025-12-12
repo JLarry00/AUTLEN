@@ -8,19 +8,19 @@ Rule 2     hundreds -> low_hundreds
 Rule 3     hundreds -> C D
 Rule 4     hundreds -> D low_hundreds
 Rule 5     hundreds -> C M
-Rule 6     low_hundreds -> C low_hundreds
+Rule 6     low_hundreds -> low_hundreds C
 Rule 7     low_hundreds -> lambda
 Rule 8     tens -> low_tens
 Rule 9     tens -> X L
 Rule 10    tens -> L low_tens
 Rule 11    tens -> X C
-Rule 12    low_tens -> X low_tens
+Rule 12    low_tens -> low_tens X
 Rule 13    low_tens -> lambda
 Rule 14    units -> low_units
 Rule 15    units -> I V
 Rule 16    units -> V low_units
 Rule 17    units -> I X
-Rule 18    low_units -> I low_units
+Rule 18    low_units -> low_units I
 Rule 19    low_units -> lambda
 Rule 20    lambda -> <empty>
 
@@ -56,10 +56,11 @@ state 0
     (3) hundreds -> . C D
     (4) hundreds -> . D low_hundreds
     (5) hundreds -> . C M
-    (6) low_hundreds -> . C low_hundreds
+    (6) low_hundreds -> . low_hundreds C
     (7) low_hundreds -> . lambda
-    (20) lambda -> .
+    (20) lambda -> . 
 
+  ! shift/reduce conflict for C resolved as shift
     C               shift and go to state 4
     D               shift and go to state 5
     X               reduce using rule 20 (lambda -> .)
@@ -67,6 +68,8 @@ state 0
     I               reduce using rule 20 (lambda -> .)
     V               reduce using rule 20 (lambda -> .)
     $end            reduce using rule 20 (lambda -> .)
+
+  ! C               [ reduce using rule 20 (lambda -> .) ]
 
     roman                          shift and go to state 1
     hundreds                       shift and go to state 2
@@ -86,15 +89,18 @@ state 2
     (9) tens -> . X L
     (10) tens -> . L low_tens
     (11) tens -> . X C
-    (12) low_tens -> . X low_tens
+    (12) low_tens -> . low_tens X
     (13) low_tens -> . lambda
     (20) lambda -> .
 
+  ! shift/reduce conflict for X resolved as shift
     X               shift and go to state 9
     L               shift and go to state 10
     I               reduce using rule 20 (lambda -> .)
     V               reduce using rule 20 (lambda -> .)
     $end            reduce using rule 20 (lambda -> .)
+
+  ! X               [ reduce using rule 20 (lambda -> .) ]
 
     tens                           shift and go to state 7
     low_tens                       shift and go to state 8
@@ -103,26 +109,33 @@ state 2
 state 3
 
     (2) hundreds -> low_hundreds .
+    (6) low_hundreds -> low_hundreds . C
 
     X               reduce using rule 2 (hundreds -> low_hundreds .)
     L               reduce using rule 2 (hundreds -> low_hundreds .)
     I               reduce using rule 2 (hundreds -> low_hundreds .)
     V               reduce using rule 2 (hundreds -> low_hundreds .)
     $end            reduce using rule 2 (hundreds -> low_hundreds .)
+    C               shift and go to state 12
 
 
 state 4
 
     (3) hundreds -> C . D
     (5) hundreds -> C . M
-    (6) low_hundreds -> C . low_hundreds
-    (6) low_hundreds -> . C low_hundreds
-    (7) low_hundreds -> . lambda
-    (20) lambda -> .
 
     D               shift and go to state 13
     M               shift and go to state 14
-    C               shift and go to state 12
+
+
+state 5
+
+    (4) hundreds -> D . low_hundreds
+    (6) low_hundreds -> . low_hundreds C
+    (7) low_hundreds -> . lambda
+    (20) lambda -> .
+
+    C               reduce using rule 20 (lambda -> .)
     X               reduce using rule 20 (lambda -> .)
     L               reduce using rule 20 (lambda -> .)
     I               reduce using rule 20 (lambda -> .)
@@ -132,27 +145,11 @@ state 4
     low_hundreds                   shift and go to state 15
     lambda                         shift and go to state 6
 
-state 5
-
-    (4) hundreds -> D . low_hundreds
-    (6) low_hundreds -> . C low_hundreds
-    (7) low_hundreds -> . lambda
-    (20) lambda -> .
-
-    C               shift and go to state 12
-    X               reduce using rule 20 (lambda -> .)
-    L               reduce using rule 20 (lambda -> .)
-    I               reduce using rule 20 (lambda -> .)
-    V               reduce using rule 20 (lambda -> .)
-    $end            reduce using rule 20 (lambda -> .)
-
-    low_hundreds                   shift and go to state 16
-    lambda                         shift and go to state 6
-
 state 6
 
     (7) low_hundreds -> lambda .
 
+    C               reduce using rule 7 (low_hundreds -> lambda .)
     X               reduce using rule 7 (low_hundreds -> lambda .)
     L               reduce using rule 7 (low_hundreds -> lambda .)
     I               reduce using rule 7 (low_hundreds -> lambda .)
@@ -167,65 +164,61 @@ state 7
     (15) units -> . I V
     (16) units -> . V low_units
     (17) units -> . I X
-    (18) low_units -> . I low_units
+    (18) low_units -> . low_units I
     (19) low_units -> . lambda
     (20) lambda -> .
 
-    I               shift and go to state 19
-    V               shift and go to state 20
+  ! shift/reduce conflict for I resolved as shift
+    I               shift and go to state 18
+    V               shift and go to state 19
     $end            reduce using rule 20 (lambda -> .)
 
-    units                          shift and go to state 17
-    low_units                      shift and go to state 18
-    lambda                         shift and go to state 21
+  ! I               [ reduce using rule 20 (lambda -> .) ]
+
+    units                          shift and go to state 16
+    low_units                      shift and go to state 17
+    lambda                         shift and go to state 20
 
 state 8
 
     (8) tens -> low_tens .
+    (12) low_tens -> low_tens . X
 
     I               reduce using rule 8 (tens -> low_tens .)
     V               reduce using rule 8 (tens -> low_tens .)
     $end            reduce using rule 8 (tens -> low_tens .)
+    X               shift and go to state 21
 
 
 state 9
 
     (9) tens -> X . L
     (11) tens -> X . C
-    (12) low_tens -> X . low_tens
-    (12) low_tens -> . X low_tens
-    (13) low_tens -> . lambda
-    (20) lambda -> .
 
-    L               shift and go to state 23
-    C               shift and go to state 24
-    X               shift and go to state 22
-    I               reduce using rule 20 (lambda -> .)
-    V               reduce using rule 20 (lambda -> .)
-    $end            reduce using rule 20 (lambda -> .)
+    L               shift and go to state 22
+    C               shift and go to state 23
 
-    low_tens                       shift and go to state 25
-    lambda                         shift and go to state 11
 
 state 10
 
     (10) tens -> L . low_tens
-    (12) low_tens -> . X low_tens
+    (12) low_tens -> . low_tens X
     (13) low_tens -> . lambda
     (20) lambda -> .
 
-    X               shift and go to state 22
+    X               reduce using rule 20 (lambda -> .)
     I               reduce using rule 20 (lambda -> .)
     V               reduce using rule 20 (lambda -> .)
     $end            reduce using rule 20 (lambda -> .)
 
-    low_tens                       shift and go to state 26
+    low_tens                       shift and go to state 24
     lambda                         shift and go to state 11
 
 state 11
 
     (13) low_tens -> lambda .
 
+    X               reduce using rule 13 (low_tens -> lambda .)
     I               reduce using rule 13 (low_tens -> lambda .)
     V               reduce using rule 13 (low_tens -> lambda .)
     $end            reduce using rule 13 (low_tens -> lambda .)
@@ -233,20 +226,15 @@ state 11
 
 state 12
 
-    (6) low_hundreds -> C . low_hundreds
-    (6) low_hundreds -> . C low_hundreds
-    (7) low_hundreds -> . lambda
-    (20) lambda -> .
+    (6) low_hundreds -> low_hundreds C .
 
-    C               shift and go to state 12
-    X               reduce using rule 20 (lambda -> .)
-    L               reduce using rule 20 (lambda -> .)
-    I               reduce using rule 20 (lambda -> .)
-    V               reduce using rule 20 (lambda -> .)
-    $end            reduce using rule 20 (lambda -> .)
+    C               reduce using rule 6 (low_hundreds -> low_hundreds C .)
+    X               reduce using rule 6 (low_hundreds -> low_hundreds C .)
+    L               reduce using rule 6 (low_hundreds -> low_hundreds C .)
+    I               reduce using rule 6 (low_hundreds -> low_hundreds C .)
+    V               reduce using rule 6 (low_hundreds -> low_hundreds C .)
+    $end            reduce using rule 6 (low_hundreds -> low_hundreds C .)
 
-    low_hundreds                   shift and go to state 15
-    lambda                         shift and go to state 6
 
 state 13
 
@@ -272,93 +260,74 @@ state 14
 
 state 15
 
-    (6) low_hundreds -> C low_hundreds .
-
-    X               reduce using rule 6 (low_hundreds -> C low_hundreds .)
-    L               reduce using rule 6 (low_hundreds -> C low_hundreds .)
-    I               reduce using rule 6 (low_hundreds -> C low_hundreds .)
-    V               reduce using rule 6 (low_hundreds -> C low_hundreds .)
-    $end            reduce using rule 6 (low_hundreds -> C low_hundreds .)
-
-
-state 16
-
     (4) hundreds -> D low_hundreds .
+    (6) low_hundreds -> low_hundreds . C
 
     X               reduce using rule 4 (hundreds -> D low_hundreds .)
     L               reduce using rule 4 (hundreds -> D low_hundreds .)
     I               reduce using rule 4 (hundreds -> D low_hundreds .)
     V               reduce using rule 4 (hundreds -> D low_hundreds .)
     $end            reduce using rule 4 (hundreds -> D low_hundreds .)
+    C               shift and go to state 12
 
 
-state 17
+state 16
 
     (1) roman -> hundreds tens units .
 
     $end            reduce using rule 1 (roman -> hundreds tens units .)
 
 
-state 18
+state 17
 
     (14) units -> low_units .
+    (18) low_units -> low_units . I
 
     $end            reduce using rule 14 (units -> low_units .)
+    I               shift and go to state 25
+
+
+state 18
+
+    (15) units -> I . V
+    (17) units -> I . X
+
+    V               shift and go to state 26
+    X               shift and go to state 27
 
 
 state 19
 
-    (15) units -> I . V
-    (17) units -> I . X
-    (18) low_units -> I . low_units
-    (18) low_units -> . I low_units
+    (16) units -> V . low_units
+    (18) low_units -> . low_units I
     (19) low_units -> . lambda
     (20) lambda -> .
 
-    V               shift and go to state 28
-    X               shift and go to state 29
-    I               shift and go to state 27
+    I               reduce using rule 20 (lambda -> .)
     $end            reduce using rule 20 (lambda -> .)
 
-    low_units                      shift and go to state 30
-    lambda                         shift and go to state 21
+    low_units                      shift and go to state 28
+    lambda                         shift and go to state 20
 
 state 20
 
-    (16) units -> V . low_units
-    (18) low_units -> . I low_units
-    (19) low_units -> . lambda
-    (20) lambda -> .
-
-    I               shift and go to state 27
-    $end            reduce using rule 20 (lambda -> .)
-
-    low_units                      shift and go to state 31
-    lambda                         shift and go to state 21
-
-state 21
-
     (19) low_units -> lambda .
 
+    I               reduce using rule 19 (low_units -> lambda .)
     $end            reduce using rule 19 (low_units -> lambda .)
 
 
+state 21
+
+    (12) low_tens -> low_tens X .
+
+    X               reduce using rule 12 (low_tens -> low_tens X .)
+    I               reduce using rule 12 (low_tens -> low_tens X .)
+    V               reduce using rule 12 (low_tens -> low_tens X .)
+    $end            reduce using rule 12 (low_tens -> low_tens X .)
+
+
 state 22
-
-    (12) low_tens -> X . low_tens
-    (12) low_tens -> . X low_tens
-    (13) low_tens -> . lambda
-    (20) lambda -> .
-
-    X               shift and go to state 22
-    I               reduce using rule 20 (lambda -> .)
-    V               reduce using rule 20 (lambda -> .)
-    $end            reduce using rule 20 (lambda -> .)
-
-    low_tens                       shift and go to state 25
-    lambda                         shift and go to state 11
-
-state 23
 
     (9) tens -> X L .
 
@@ -367,7 +336,7 @@ state 23
     $end            reduce using rule 9 (tens -> X L .)
 
 
-state 24
+state 23
 
     (11) tens -> X C .
 
@@ -376,61 +345,50 @@ state 24
     $end            reduce using rule 11 (tens -> X C .)
 
 
-state 25
-
-    (12) low_tens -> X low_tens .
-
-    I               reduce using rule 12 (low_tens -> X low_tens .)
-    V               reduce using rule 12 (low_tens -> X low_tens .)
-    $end            reduce using rule 12 (low_tens -> X low_tens .)
-
-
-state 26
+state 24
 
     (10) tens -> L low_tens .
+    (12) low_tens -> low_tens . X
 
     I               reduce using rule 10 (tens -> L low_tens .)
     V               reduce using rule 10 (tens -> L low_tens .)
     $end            reduce using rule 10 (tens -> L low_tens .)
+    X               shift and go to state 21
 
 
-state 27
+state 25
 
-    (18) low_units -> I . low_units
-    (18) low_units -> . I low_units
-    (19) low_units -> . lambda
-    (20) lambda -> .
+    (18) low_units -> low_units I .
 
-    I               shift and go to state 27
-    $end            reduce using rule 20 (lambda -> .)
+    I               reduce using rule 18 (low_units -> low_units I .)
+    $end            reduce using rule 18 (low_units -> low_units I .)
 
-    low_units                      shift and go to state 30
-    lambda                         shift and go to state 21
 
-state 28
+state 26
 
     (15) units -> I V .
 
     $end            reduce using rule 15 (units -> I V .)
 
 
-state 29
+state 27
 
     (17) units -> I X .
 
     $end            reduce using rule 17 (units -> I X .)
 
 
-state 30
-
-    (18) low_units -> I low_units .
-
-    $end            reduce using rule 18 (low_units -> I low_units .)
-
-
-state 31
+state 28
 
     (16) units -> V low_units .
+    (18) low_units -> low_units . I
 
     $end            reduce using rule 16 (units -> V low_units .)
+    I               shift and go to state 25
 
+WARNING: 
+WARNING: Conflicts:
+WARNING: 
+WARNING: shift/reduce conflict for C in state 0 resolved as shift
+WARNING: shift/reduce conflict for X in state 2 resolved as shift
+WARNING: shift/reduce conflict for I in state 7 resolved as shift

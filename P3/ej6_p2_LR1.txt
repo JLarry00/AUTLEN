@@ -24,32 +24,32 @@ H  -> .C D     , L/X/I/V/$
 H  -> .D Lh    , L/X/I/V/$
 H  -> .C M     , L/X/I/V/$
 Lh -> .Lh C    , L/X/I/V/$
-Lh -> .        , L/X/I/V/$
+Lh -> .        , C/L/X/I/V/$
 
---- ESTADO S0R (Transición con R) ---
+--- ESTADO S1 (Transición con R) ---
 S' -> R.       , $
 
---- ESTADO S0H (Transición con H) ---
+--- ESTADO S2 (Transición con H) ---
 R  -> H.T U    , $
 T  -> .Lt      , I/V/$
 T  -> .X L     , I/V/$
 T  -> .L Lt    , I/V/$
 T  -> .X C     , I/V/$
 Lt -> .Lt X    , I/V/$
-Lt -> .        , I/V/$
+Lt -> .        , X/I/V/$
 
---- ESTADO S0Lh (Transición con Lh) ---
+--- ESTADO S3 (Transición con Lh) ---
 H  -> Lh.      , L/X/I/V/$
 Lh -> Lh.C     , L/X/I/V/$
 
---- ESTADO S0C (Transición con C) ---
+--- ESTADO S4 (Transición con C) ---
 H  -> C.D      , L/X/I/V/$
 H  -> C.M      , L/X/I/V/$
 
---- ESTADO S0D (Transición con D) ---
+--- ESTADO S5 (Transición con D) ---
 H  -> D.Lh     , L/X/I/V/$
 Lh -> .Lh C    , L/X/I/V/$
-Lh -> .        , L/X/I/V/$
+Lh -> .        , C/L/X/I/V/$
 
 
 
@@ -60,7 +60,7 @@ Lh -> .        , L/X/I/V/$
 
 
 =========================================
-1. GRAMÁTICA (Reglas de producción)
+1. GRAMÁTICA 2 (Reglas de producción)
 =========================================
 S' -> R
 R  -> H T U
@@ -87,10 +87,10 @@ H  -> .C M     , L/X/I/V/$
 Lh -> .C Lh    , L/X/I/V/$
 Lh -> .        , L/X/I/V/$
 
---- ESTADO S0R (Transición con R) ---
+--- ESTADO S1 (Transición con R) ---
 S' -> R.       , $
 
---- ESTADO S0H (Transición con H) ---
+--- ESTADO S2 (Transición con H) ---
 R  -> H.T U    , $
 T  -> .Lt      , I/V/$
 T  -> .X L     , I/V/$
@@ -99,17 +99,17 @@ T  -> .X C     , I/V/$
 Lt -> .X Lt    , I/V/$
 Lt -> .        , I/V/$
 
---- ESTADO S0Lh (Transición con Lh) ---
+--- ESTADO S3 (Transición con Lh) ---
 H  -> Lh.      , L/X/I/V/$
 
---- ESTADO S0C (Transición con C) ---
+--- ESTADO S4 (Transición con C) ---
 H  -> C.D      , L/X/I/V/$
 H  -> C.M      , L/X/I/V/$
 Lh -> C.Lh     , L/X/I/V/$
 Lh -> .C Lh    , L/X/I/V/$
 Lh -> .        , L/X/I/V/$
 
---- ESTADO S0D (Transición con D) ---
+--- ESTADO S5 (Transición con D) ---
 H  -> D.Lh     , L/X/I/V/$
-Lh -> .C       , L/X/I/V/$   [Nota: Probablemente sea .C Lh]
+Lh -> .C Lh    , L/X/I/V/$
 Lh -> .        , L/X/I/V/$
